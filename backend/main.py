@@ -10,7 +10,7 @@ from app.agent_routes import router as agent_router
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://blog-app.vercel.app"],
+    allow_origins=["http://localhost:3000", "https://blogout.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

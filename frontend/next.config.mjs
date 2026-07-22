@@ -11,6 +11,7 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "blog-app-agent.fastapicloud.dev",
+        pathname: "/static/**",
       },
       {
         protocol: "https",

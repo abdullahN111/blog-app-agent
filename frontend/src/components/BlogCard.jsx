@@ -23,7 +23,7 @@ export default function BlogCard({ blog }) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 left-4">
-          <Link href={`/blogs/${blog.category.toLowerCase()}`}>
+          <Link href={`/blogs/category/${blog.category.toLowerCase()}`}>
             <span className="px-3 py-1 bg-middle text-white text-sm font-semibold rounded-full shadow-md cursor-pointer">
               {blog.category}
             </span>
@@ -31,7 +31,7 @@ export default function BlogCard({ blog }) {
         </div>
       </div>
 
-      <div className="flex flex-col flex-grow p-6">
+      <div className="flex flex-col grow p-6">
         <h3 className="text-lg font-bold text-primary mb-2 line-clamp-2 group-hover:text-middle transition-colors">
           {blog.title}
         </h3>
