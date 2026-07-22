@@ -10,6 +10,10 @@ const nextConfig = {
       },
       {
         protocol: "https",
+        hostname: "blog-app-agent.fastapicloud.dev",
+      },
+      {
+        protocol: "https",
         hostname: "lh3.googleusercontent.com",
       },
     ],
