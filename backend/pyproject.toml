@@ -47,3 +47,6 @@ dependencies = [
     "urllib3==2.5.0",
     "uvicorn==0.35.0",
 ]
+
+[tool.setuptools]
+packages = ["app", "utils"]
