@@ -5,7 +5,7 @@ import { FiArrowRight, FiBookOpen, FiCheck, FiLoader } from "react-icons/fi";
 import { categories } from "../../../public/assets/blogRelatedData";
 
 export default function CreateBlog() {
-  const formRef = useRef(null)
+  const formRef = useRef(null);
   const [buttonState, setButtonState] = useState("idle");
 
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ export default function CreateBlog() {
         {
           method: "POST",
           body: formDataToSend,
-        }
+        },
       );
 
       const imagePaths = await uploadResponse.json();
@@ -62,7 +62,7 @@ export default function CreateBlog() {
 
       const agentResult = await agentResponse.json();
 
-      const blogResponse = await fetch("http://127.0.0.1:8000/blogs", {
+      const blogResponse = await fetch(`${API_URL}/blogs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -272,12 +272,13 @@ export default function CreateBlog() {
               <button
                 type="submit"
                 disabled={buttonState === "loading"}
-                className={`w-full flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg transition-all duration-300 cursor-pointer ${buttonState === "loading"
-                  ? "bg-gray-400"
-                  : buttonState === "success"
-                    ? "bg-green-500"
-                    : "bg-middle hover:bg-[#f31e65ef] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f31e65da]"
-                  }`}
+                className={`w-full flex items-center justify-center px-6 py-3 text-white font-medium rounded-lg transition-all duration-300 cursor-pointer ${
+                  buttonState === "loading"
+                    ? "bg-gray-400"
+                    : buttonState === "success"
+                      ? "bg-green-500"
+                      : "bg-middle hover:bg-[#f31e65ef] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f31e65da]"
+                }`}
               >
                 {getButtonContent()}
               </button>
