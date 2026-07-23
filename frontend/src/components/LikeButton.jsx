@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
+import { authFetch } from "@/utils/authFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -17,11 +18,12 @@ export default function LikeButton({ blogId }) {
     if (!session) return;
 
     async function loadLiked() {
-      const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
+      const res = await authFetch(`${API_URL}/liked-blogs/${blogId}`, {
         headers: {
           Authorization: `Bearer ${session.id_token}`,
         },
       });
+      if (!res) return;
 
       if (res.ok) {
         const data = await res.json();
@@ -39,12 +41,14 @@ export default function LikeButton({ blogId }) {
     }
 
     try {
-      const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
+      const res = await authFetch(`${API_URL}/liked-blogs/${blogId}`, {
         method: liked ? "DELETE" : "POST",
         headers: {
           Authorization: `Bearer ${session.id_token}`,
         },
       });
+
+      if (!res) return;
 
       if (res.ok) {
         setLiked(!liked);
@@ -66,9 +70,7 @@ export default function LikeButton({ blogId }) {
         <FiHeart className="size-8" />
       )}
 
-      <span className="text-xl">
-        {liked ? "Liked" : "Like"}
-      </span>
+      <span className="text-xl">{liked ? "Liked" : "Like"}</span>
       {error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
     </button>
   );

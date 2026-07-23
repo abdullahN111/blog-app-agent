@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { authFetch } from "@/utils/authFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -30,7 +31,7 @@ export default function CommentForm({ blogId }) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/comments`, {
+      const res = await authFetch(`${API_URL}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,14 +44,17 @@ export default function CommentForm({ blogId }) {
         credentials: "include",
       });
 
+      if (!res) return;
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(
-          errorData.detail || `HTTP error! status: ${res.status}`
+          errorData.detail || `HTTP error! status: ${res.status}`,
         );
       }
 
       setText("");
+      window.location.reload();
     } catch (err) {
       setError(err.message || "Failed to post comment");
       console.error("Comment submission error:", err);

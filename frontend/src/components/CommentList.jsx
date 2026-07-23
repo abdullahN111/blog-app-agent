@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { FiTrash2 } from "react-icons/fi";
+import { authFetch } from "@/utils/authFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -13,12 +14,13 @@ export default function CommentList({ comments }) {
     if (!confirm("Delete this comment?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/comments/${commentId}`, {
+      const res = await authFetch(`${API_URL}/comments/${commentId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${session.id_token}`,
         },
       });
+      if (!res) return;
 
       if (!res.ok) {
         const data = await res.json();
@@ -65,9 +67,7 @@ export default function CommentList({ comments }) {
           <div className="flex-1">
             <div className="flex justify-between items-start">
               <div>
-                <h4 className="font-semibold text-primary">
-                  {c.user_name}
-                </h4>
+                <h4 className="font-semibold text-primary">{c.user_name}</h4>
 
                 <p className="text-xs text-gray-400">
                   {new Date(c.created_at).toLocaleDateString("en-US", {
@@ -88,9 +88,7 @@ export default function CommentList({ comments }) {
               )}
             </div>
 
-            <p className="mt-3 text-gray-700 whitespace-pre-wrap">
-              {c.text}
-            </p>
+            <p className="mt-3 text-gray-700 whitespace-pre-wrap">{c.text}</p>
           </div>
         </div>
       ))}
