@@ -48,7 +48,7 @@ export default function CreateBlogModal({ open, onClose, loggedIn }) {
             </p>
 
             <Link
-              href="https://youtube.com/your-video"
+              href="https://www.youtube.com/watch?v=Xn-8I7QdmN8"
               target="_blank"
               className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-white font-medium hover:bg-red-700 transition"
             >
