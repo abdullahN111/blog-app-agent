@@ -42,7 +42,7 @@ export default function CreateBlog() {
         formDataToSend.append("secondary_image", formData.secondaryImage);
       }
       const uploadResponse = await fetch(
-        "http://127.0.0.1:8000/upload-images",
+        "https://blog-app-agent.fastapicloud.dev/upload-images",
         {
           method: "POST",
           body: formDataToSend,
