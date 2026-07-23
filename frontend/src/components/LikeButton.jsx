@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
-import { authFetch } from "@/utils/authFetch";
+import { authFetch } from "../utils/authFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

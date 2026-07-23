@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { FiTrash2 } from "react-icons/fi";
-import { authFetch } from "@/utils/authFetch";
+import { authFetch } from "../utils/authFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
