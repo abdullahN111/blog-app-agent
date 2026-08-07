@@ -15,7 +15,7 @@ models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
 
-
+ 
 
 
 @router.post("/blogs", response_model=models.BlogModel)

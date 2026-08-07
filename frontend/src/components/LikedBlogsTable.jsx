@@ -22,7 +22,7 @@ export default function LikedBlogsTable({ blogs }) {
       headers: {
         Authorization: `Bearer ${session.id_token}`,
       },
-    });
+    }); 
 
     if (!res.ok) {
       throw new Error("Failed to remove blog");
@@ -40,7 +40,7 @@ export default function LikedBlogsTable({ blogs }) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center shadow-sm">
         <h3 className="text-2xl font-semibold text-slate-900">
-          No liked blogs yet
+          No liked blogs yet.
         </h3>
 
         <p className="mt-2 text-slate-500">Like blogs to see them here.</p>
