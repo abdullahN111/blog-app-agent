@@ -2,39 +2,34 @@
 
 import { useEffect } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function ViewTracker({ blogId }) {
-useEffect(() => {
-  console.log("ViewTracker mounted");
+  useEffect(() => {
+    const key = `viewed-${blogId}`;
 
-  const key = `viewed-${blogId}`;
+    if (sessionStorage.getItem(key)) return;
 
-  console.log("session key:", key);
-  console.log("stored value:", sessionStorage.getItem(key));
+    const trackView = async () => {
+      try {
+        const res = await fetch(`${API_URL}/blogs/${blogId}/view`, {
+          method: "POST",
+        });
 
-  if (sessionStorage.getItem(key)) {
-    console.log("Already viewed");
-    return;
-  }
+        if (!res.ok) {
+          console.error("Failed to record view");
+          return;
+        }
 
-  console.log("About to fetch");
-
-  fetch(`${API_URL}/blogs/${blogId}/view`, {
-    method: "POST",
-  })
-    .then(async (res) => {
-      console.log("Response:", res.status);
-      console.log(await res.text());
-
-      if (res.ok) {
         sessionStorage.setItem(key, "true");
+      } catch (err) {
+        console.error("View tracking failed:", err);
       }
-    })
-    .catch((err) => {
-      console.error("Fetch failed:", err);
-    });
-}, [blogId]);
+    };
+
+    trackView();
+  }, [blogId]);
 
   return null;
 }
