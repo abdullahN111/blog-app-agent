@@ -5,11 +5,38 @@ import Link from "next/link";
 import { FiEye } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import { generateSlug } from "../utils/utils";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function LikedBlogsTable({ blogs }) {
-  if (!blogs.length) {
+  const { data: session } = useSession();
+  const [likedBlogs, setLikedBlogs] = useState(blogs);
+
+  const removeLiked = async (blogId) => {
+    if (!session) return;
+  try {
+    const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${session.id_token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to remove blog");
+    }
+
+    setLikedBlogs((prev) =>
+      prev.filter((blog) => blog.id !== blogId)
+    );
+  } catch (err) {
+    console.error(err);
+  }
+};
+  
+  if (!likedBlogs.length) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center shadow-sm">
         <h3 className="text-2xl font-semibold text-slate-900">
@@ -46,7 +73,7 @@ export default function LikedBlogsTable({ blogs }) {
           </thead>
 
           <tbody>
-            {blogs.map((blog) => {
+            {likedBlogs.map((blog) => {
               const slug = generateSlug(blog.title);
 
               return (
@@ -108,9 +135,12 @@ export default function LikedBlogsTable({ blogs }) {
                         View
                       </Link>
 
-                      <button className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700">
-                        Remove
-                      </button>
+                      <button
+  onClick={() => removeLiked(blog.id)}
+  className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700 cursor-pointer"
+>
+  Remove
+</button>
                     </div>
                   </td>
                 </tr>

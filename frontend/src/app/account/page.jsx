@@ -133,35 +133,6 @@ export default async function AccountPage() {
           </div>
         </section>
 
-        <section className="mt-16">
-          <div className="flex items-center gap-3 mb-7">
-            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
-              <FiHeart className="text-red-500 text-xl" />
-            </div>
-
-            <div>
-              <h2 className="text-3xl font-bold text-primary">Liked Blogs</h2>
-
-              <p className="text-gray-500">Blogs you've saved for later.</p>
-            </div>
-          </div>
-
-          {likedBlogs.length ? (
-            <LikedBlogsTable blogs={likedBlogs} />
-          ) : (
-            <div className="bg-white border rounded-3xl shadow-lg p-20 text-center">
-              <FiHeart className="text-6xl text-gray-300 mx-auto mb-5" />
-
-              <h3 className="text-2xl font-semibold text-primary">
-                No liked blogs yet
-              </h3>
-
-              <p className="text-gray-500 mt-3">
-                Start exploring and like articles you enjoy.
-              </p>
-            </div>
-          )}
-        </section>
 
         {isAdmin && (
           <section className="mt-20">
@@ -198,6 +169,35 @@ export default async function AccountPage() {
             )}
           </section>
         )}
+           <section className="mt-16">
+          <div className="flex items-center gap-3 mb-7">
+            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
+              <FiHeart className="text-red-500 text-xl" />
+            </div>
+
+            <div>
+              <h2 className="text-3xl font-bold text-primary">Liked Blogs</h2>
+
+              <p className="text-gray-500">Blogs you've saved for later.</p>
+            </div>
+          </div>
+
+          {likedBlogs.length ? (
+            <LikedBlogsTable blogs={likedBlogs} />
+          ) : (
+            <div className="bg-white border rounded-3xl shadow-lg p-20 text-center">
+              <FiHeart className="text-6xl text-gray-300 mx-auto mb-5" />
+
+              <h3 className="text-2xl font-semibold text-primary">
+                No liked blogs yet
+              </h3>
+
+              <p className="text-gray-500 mt-3">
+                Start exploring and like articles you enjoy.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
     </main>
   );
