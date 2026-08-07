@@ -28,6 +28,7 @@ dependencies = [
     "mcp==1.12.4",
     "openai==1.99.1",
     "openai-agents==0.2.5",
+    "psycopg2-binary>=2.9.12",
     "pydantic==2.11.7",
     "pydantic-core==2.33.2",
     "pydantic-settings==2.10.1",
