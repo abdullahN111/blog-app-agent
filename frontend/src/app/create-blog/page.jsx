@@ -3,10 +3,14 @@
 import { useRef, useState } from "react";
 import { FiArrowRight, FiBookOpen, FiCheck, FiLoader } from "react-icons/fi";
 import { categories } from "../../../public/assets/blogRelatedData";
+import { useSession } from "next-auth/react";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function CreateBlog() {
   const formRef = useRef(null);
   const [buttonState, setButtonState] = useState("idle");
+  const { data: session } = useSession();
 
   const [formData, setFormData] = useState({
     topic: "",
@@ -33,6 +37,10 @@ export default function CreateBlog() {
   };
 
   const handleSubmit = async (e) => {
+    if (!session) {
+      setButtonState("Please login first.");
+      return;
+    }
     e.preventDefault();
     setButtonState("loading");
     try {
@@ -41,17 +49,12 @@ export default function CreateBlog() {
       if (formData.secondaryImage) {
         formDataToSend.append("secondary_image", formData.secondaryImage);
       }
-      const uploadResponse = await fetch(
-        "https://blog-app-agent.fastapicloud.dev/upload-images",
-        {
-          method: "POST",
-          body: formDataToSend,
-        },
-      );
+      const uploadResponse = await fetch(`${API_URL}/upload-images`, {
+        method: "POST",
+        body: formDataToSend,
+      });
 
       const imagePaths = await uploadResponse.json();
-      const API_URL =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const agentResponse = await fetch(`${API_URL}/agent`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,7 +67,10 @@ export default function CreateBlog() {
 
       const blogResponse = await fetch(`${API_URL}/blogs`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.id_token}`,
+        },
         body: JSON.stringify({
           title: formData.topic,
           perspective: formData.views,

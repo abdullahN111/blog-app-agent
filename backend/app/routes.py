@@ -19,10 +19,13 @@ router = APIRouter()
 
 
 @router.post("/blogs", response_model=models.BlogModel)
-async def create_blog(blog: models.BlogCreate, db: db_dependency):
+async def create_blog(blog: models.BlogCreate,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)):
     slug = generate_slug(blog.title) 
 
     new_blog = models.Blog(
+        user_id=user.id,
         title=blog.title,
         slug=slug,
         perspective=blog.perspective,
@@ -30,7 +33,7 @@ async def create_blog(blog: models.BlogCreate, db: db_dependency):
         introContent=blog.introContent,
         contentHeading=blog.contentHeading,
         content=blog.content,
-       category=generate_slug(blog.category),
+        category=generate_slug(blog.category),
         popularity=blog.popularity,
         primary_image=blog.primary_image,
         secondary_image=blog.secondary_image,
@@ -268,3 +271,15 @@ async def increment_view(blog_id: int, db: db_dependency):
     db.commit()
 
     return {"views": blog.views}
+
+
+@router.get("/my-blogs", response_model=List[models.BlogModel])
+async def get_my_blogs(
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    return (
+        db.query(models.Blog)
+        .filter(models.Blog.user_id == user.id)
+        .all()
+    )

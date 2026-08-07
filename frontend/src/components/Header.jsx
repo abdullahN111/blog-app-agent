@@ -182,17 +182,19 @@ export default function Header() {
                         </p>
                       </div>
                     </div>
-
-                    <div className="pt-2 border-t border-gray-100">
-                      <Link
-                        href="/account"
-                        className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
-                        onClick={() => setIsAccountDropdownOpen(false)}
-                      >
-                        Manage Account
-                      </Link>
-                    </div>
-
+                    {isAdmin ? (
+                      <div className="pt-2 border-t border-gray-100">
+                        <Link
+                          href="/account"
+                          className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
+                          onClick={() => setIsAccountDropdownOpen(false)}
+                        >
+                          Manage Account
+                        </Link>
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                     <button
                       onClick={() => signOut()}
                       className="w-full text-left text-red-600 hover:text-red-800 text-sm py-1 transition-colors duration-200 cursor-pointer"
@@ -465,15 +467,17 @@ export default function Header() {
                     </p>
                   </div>
                 </div>
-
-                <Link
-                  href="/account"
-                  className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
-                  onClick={toggleMenu}
-                >
-                  Manage Account
-                </Link>
-
+                {isAdmin ? (
+                  <Link
+                    href="/account"
+                    className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
+                    onClick={toggleMenu}
+                  >
+                    Manage Account
+                  </Link>
+                ) : (
+                  <></>
+                )}
                 <button
                   onClick={() => signOut()}
                   className="text-red-600 hover:text-red-800 text-sm py-1 transition-colors duration-200"

@@ -11,6 +11,11 @@ class Blog(Base):
     __tablename__ = "blogs"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
     title = Column(String, nullable=False)
     slug = Column(String, unique=True, index=True, nullable=False)
     perspective = Column(Text, nullable=False)
@@ -25,6 +30,7 @@ class Blog(Base):
     views = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     favorites = relationship("LikedBlog", back_populates="blog")
+    author = relationship("User", backref="blogs")
 
     @property
     def likes(self):
@@ -63,7 +69,7 @@ class LikedBlog(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     blog = relationship("Blog", back_populates="favorites")
-user = relationship("User", backref="favorites")
+    user = relationship("User", backref="favorites")
 
 
 
