@@ -3,6 +3,8 @@ export const generateSlug = (text) => {
     .toLowerCase()
     .replace(/\//g, "-")
     .replace(/\?/g, "")
-    .replace(/[^\w -]+/g, "")
-    .replace(/\s+/g, "-");
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 };

@@ -3,10 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiCalendar, FiEye, FiArrowRight, FiHeart } from "react-icons/fi";
-import { generateSlug } from "../utils/utils";
 
 export default function BlogCard({ blog }) {
-  const slug = generateSlug(blog.title);
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   return (
@@ -63,7 +61,7 @@ export default function BlogCard({ blog }) {
         </div>
 
         <Link
-          href={`/blogs/blog/${slug}`}
+          href={`/blogs/blog/${blog.slug}`}
           className="inline-flex items-center justify-center px-4 py-2.5 bg-gray-100 text-primary text-sm font-semibold rounded-lg hover:bg-middle hover:text-white transition-all duration-300 group/btn"
         >
           Read Article

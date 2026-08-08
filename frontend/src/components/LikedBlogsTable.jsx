@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { FiEye } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
-import { generateSlug } from "../utils/utils";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
@@ -74,7 +73,7 @@ export default function LikedBlogsTable({ blogs }) {
 
           <tbody>
             {likedBlogs.map((blog) => {
-              const slug = generateSlug(blog.title);
+              const slug = blog.slug;
 
               return (
                 <tr

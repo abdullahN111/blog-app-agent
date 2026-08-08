@@ -4,16 +4,34 @@ import Hero from "../components/Hero";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function getAllBlogs() {
-  const res = await fetch(`${API_URL}/blogs`, {
-    cache: "no-store",
-  });
+  const maxAttempts = 3;
 
-  if (!res.ok) {
-    console.error("Failed to fetch blogs");
-    return [];
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(`${API_URL}/blogs`, {
+        cache: "no-store",
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+
+      console.error(
+        `Failed to fetch blogs. Attempt ${attempt}: ${res.status}`
+      );
+    } catch (error) {
+      console.error(
+        `Failed to fetch blogs. Attempt ${attempt}:`,
+        error
+      );
+    }
+
+    if (attempt < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+    }
   }
 
-  return res.json();
+  return [];
 }
 
 export default async function Home() {
