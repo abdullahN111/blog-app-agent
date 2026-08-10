@@ -22,7 +22,8 @@ export default function ViewTracker({ blogId }) {
           return;
         }
 
-        sessionStorage.setItem(key, "true");
+        localStorage.setItem(key, "true");
+        
       } catch (err) {
         console.error("View tracking failed:", err);
       }
