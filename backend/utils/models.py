@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from pydantic import BaseModel
@@ -28,9 +28,11 @@ class Blog(Base):
     primary_image = Column(String, nullable=True)   
     secondary_image = Column(String, nullable=True)   
     views = Column(Integer, default=0)
+    published = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     favorites = relationship("LikedBlog", back_populates="blog")
     author = relationship("User", backref="blogs")
+    
 
     @property
     def likes(self):
@@ -96,6 +98,7 @@ class BlogModel(BlogBase):
     id: int
     slug: str
     views: int   
+    published: bool
     likes: int = 0
     created_at: datetime
 

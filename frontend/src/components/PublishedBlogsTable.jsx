@@ -2,14 +2,96 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FiEye, FiHeart, FiEdit2, FiTrash2, FiArchive } from "react-icons/fi";
+import {
+  FiEye,
+  FiHeart,
+  FiEdit2,
+  FiTrash2,
+  FiArchive,
+  FiCheck,
+} from "react-icons/fi";
 import { generateSlug } from "../utils/utils";
-import { FaHeart } from "react-icons/fa";
+import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function PublishedBlogsTable({ blogs }) {
-  if (!blogs.length) {
+  const [blogList, setBlogList] = useState(blogs);
+  const [loadingId, setLoadingId] = useState(null);
+  const { data: session } = useSession();
+
+  const handleUnpublish = async (blogId) => {
+    if (!session?.id_token) {
+      alert("Please login again.");
+      return;
+    }
+
+    try {
+      setLoadingId(blogId);
+
+      const response = await fetch(`${API_URL}/blogs/${blogId}/unpublish`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${session.id_token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to unpublish blog");
+      }
+
+      setBlogList((currentBlogs) =>
+        currentBlogs.map((blog) =>
+          blog.id === blogId ? { ...blog, published: false } : blog,
+        ),
+      );
+    } catch (error) {
+      console.error("Unpublish error:", error);
+      alert(error.message);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handlePublish = async (blogId) => {
+    if (!session?.id_token) {
+      alert("Please login again.");
+      return;
+    }
+
+    try {
+      setLoadingId(blogId);
+
+      const response = await fetch(`${API_URL}/blogs/${blogId}/publish`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${session.id_token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to publish blog");
+      }
+
+      setBlogList((currentBlogs) =>
+        currentBlogs.map((blog) =>
+          blog.id === blogId ? { ...blog, published: true } : blog,
+        ),
+      );
+    } catch (error) {
+      console.error("Publish error:", error);
+      alert(error.message);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  if (!blogList.length) {
     return (
       <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
         <h3 className="text-xl font-semibold text-primary">
@@ -48,7 +130,7 @@ export default function PublishedBlogsTable({ blogs }) {
           </thead>
 
           <tbody>
-            {blogs.map((blog) => {
+            {blogList.map((blog) => {
               const slug = generateSlug(blog.title);
 
               return (
@@ -90,7 +172,7 @@ export default function PublishedBlogsTable({ blogs }) {
                   <td className="px-7 py-6">
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-base text-slate-700">
-                        <FaHeart className="text-red-500 size-4" />
+                        <FiHeart className="text-red-500 size-4" />
                         <span className="font-semibold">{blog.likes}</span>
                       </div>
 
@@ -118,12 +200,25 @@ export default function PublishedBlogsTable({ blogs }) {
                         <FiEdit2 size={16} />
                       </button>
 
-                      <button
-                        title="Unpublish"
-                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-amber-500 hover:text-white"
-                      >
-                        <FiArchive size={16} />
-                      </button>
+                      {blog.published ? (
+                        <button
+                          title="Unpublish"
+                          onClick={() => handleUnpublish(blog.id)}
+                          disabled={loadingId === blog.id}
+                          className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-amber-500 hover:text-white disabled:opacity-50"
+                        >
+                          <FiArchive size={16} />
+                        </button>
+                      ) : (
+                        <button
+                          title="Publish"
+                          onClick={() => handlePublish(blog.id)}
+                          disabled={loadingId === blog.id}
+                          className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-green-600 hover:text-white disabled:opacity-50"
+                        >
+                          <FiCheck size={16} />
+                        </button>
+                      )}
 
                       <button
                         title="Delete"

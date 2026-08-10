@@ -73,23 +73,55 @@ async def upload_images(
     
 @router.get("/blogs", response_model=List[models.BlogModel])
 async def get_all_blogs(db: db_dependency):
-    return db.query(models.Blog).all()
+    return (
+        db.query(models.Blog)
+        .filter(models.Blog.published.is_(True))
+        .all()
+    )
 
 @router.get("/blogs/{slug}", response_model=models.BlogModel)
 async def get_single_blog(slug: str, db: db_dependency):
-    blog = db.query(models.Blog).filter(models.Blog.slug == slug).first()
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.slug == slug,
+            models.Blog.published.is_(True)
+        )
+        .first()
+    )
 
     if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
 
     return blog
 
-@router.get("/blogs/category/{category}", response_model=List[models.BlogModel])
-async def get_blog_by_category(category: str, db: db_dependency):
-    blog = db.query(models.Blog).filter(models.Blog.category == category.lower()).all()
-    if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
-    return blog
+@router.get(
+    "/blogs/category/{category}",
+    response_model=List[models.BlogModel]
+)
+async def get_blog_by_category(
+    category: str,
+    db: db_dependency
+):
+    blogs = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.category == category.lower(),
+            models.Blog.published.is_(True)
+        )
+        .all()
+    )
+
+    if not blogs:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
+
+    return blogs
 
 
 @router.post("/comments", response_model=models.CommentModel)
@@ -283,3 +315,67 @@ async def get_my_blogs(
         .filter(models.Blog.user_id == user.id)
         .all()
     )
+    
+    
+@router.patch("/blogs/{blog_id}/publish")
+async def publish_blog(
+    blog_id: int,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.user_id == user.id
+        )
+        .first()
+    )
+
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
+
+    blog.published = True
+
+    db.commit()
+    db.refresh(blog)
+
+    return {
+        "message": "Blog published successfully",
+        "published": blog.published
+    }
+    
+
+@router.patch("/blogs/{blog_id}/unpublish")
+async def unpublish_blog(
+    blog_id: int,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.user_id == user.id
+        )
+        .first()
+    )
+
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
+
+    blog.published = False
+
+    db.commit()
+    db.refresh(blog)
+
+    return {
+        "message": "Blog unpublished successfully",
+        "published": blog.published
+    }
