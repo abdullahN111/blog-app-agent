@@ -10,7 +10,7 @@ import {
   FiLoader,
   FiSave,
 } from "react-icons/fi";
-import { categories } from "../../../../public/assets/blogRelatedData";
+import { categories } from "../../../../../public/assets/blogRelatedData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
