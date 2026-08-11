@@ -50,6 +50,7 @@ async def upload_images(
     primary_image: UploadFile = File(...),
     secondary_image: UploadFile = File(None)
 ):
+    os.makedirs("static", exist_ok=True)
    
     primary_filename = f"{uuid.uuid4().hex}_{primary_image.filename}"
     primary_path = os.path.join("static", primary_filename)
@@ -78,6 +79,30 @@ async def get_all_blogs(db: db_dependency):
         .filter(models.Blog.published.is_(True))
         .all()
     )
+    
+    
+@router.get("/blogs/id/{blog_id}", response_model=models.BlogModel)
+async def get_blog_by_id(
+    blog_id: int,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.user_id == user.id
+        )
+        .first()
+    )
+
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found or you are not authorized"
+        )
+
+    return blog
 
 @router.get("/blogs/{slug}", response_model=models.BlogModel)
 async def get_single_blog(slug: str, db: db_dependency):
@@ -379,3 +404,110 @@ async def unpublish_blog(
         "message": "Blog unpublished successfully",
         "published": blog.published
     }
+
+@router.delete("/blogs/{blog_id}")
+async def delete_blog(
+    blog_id: int,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.user_id == user.id
+        )
+        .first()
+    )
+
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found or you are not authorized"
+        )
+
+    db.query(models.LikedBlog).filter(
+        models.LikedBlog.blog_id == blog_id
+    ).delete(synchronize_session=False)
+
+    db.query(models.Comment).filter(
+        models.Comment.blog_id == blog_id
+    ).delete(synchronize_session=False)
+
+
+    for image_path in [blog.primary_image, blog.secondary_image]:
+        if image_path:
+            image_file = image_path.replace("\\", "/")
+
+            if image_file.startswith("static/"):
+                if os.path.exists(image_file):
+                    os.remove(image_file)
+
+    db.delete(blog)
+    db.commit()
+
+    return {
+        "message": "Blog deleted successfully"
+    }
+    
+
+@router.put("/blogs/{blog_id}", response_model=models.BlogModel)
+async def update_blog(
+    blog_id: int,
+    blog_data: models.BlogCreate,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.user_id == user.id
+        )
+        .first()
+    )
+
+    if not blog:
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found or you are not authorized"
+        )
+
+    new_slug = generate_slug(blog_data.title)
+
+    existing_blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.slug == new_slug,
+            models.Blog.id != blog_id
+        )
+        .first()
+    )
+
+    if existing_blog:
+        raise HTTPException(
+            status_code=400,
+            detail="Another blog already uses this title/slug"
+        )
+
+    blog.title = blog_data.title
+    blog.slug = new_slug
+
+    blog.perspective = blog_data.perspective
+
+    blog.introContentHeading = blog_data.introContentHeading
+    blog.introContent = blog_data.introContent
+
+    blog.contentHeading = blog_data.contentHeading
+    blog.content = blog_data.content
+
+    blog.category = generate_slug(blog_data.category)
+    blog.popularity = blog_data.popularity
+
+    blog.primary_image = blog_data.primary_image
+    blog.secondary_image = blog_data.secondary_image
+
+    db.commit()
+    db.refresh(blog)
+
+    return blog

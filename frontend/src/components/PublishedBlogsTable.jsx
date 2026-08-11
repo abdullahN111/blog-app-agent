@@ -13,6 +13,7 @@ import {
 import { generateSlug } from "../utils/utils";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,6 +21,7 @@ export default function PublishedBlogsTable({ blogs }) {
   const [blogList, setBlogList] = useState(blogs);
   const [loadingId, setLoadingId] = useState(null);
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleUnpublish = async (blogId) => {
     if (!session?.id_token) {
@@ -85,6 +87,47 @@ export default function PublishedBlogsTable({ blogs }) {
       );
     } catch (error) {
       console.error("Publish error:", error);
+      alert(error.message);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const handleDelete = async (blogId) => {
+    if (!session?.id_token) {
+      alert("Please login again.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to permanently delete this blog? This action cannot be undone.",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      setLoadingId(blogId);
+
+      const response = await fetch(`${API_URL}/blogs/${blogId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.id_token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to delete blog");
+      }
+
+      setBlogList((currentBlogs) =>
+        currentBlogs.filter((blog) => blog.id !== blogId),
+      );
+    } catch (error) {
+      console.error("Delete error:", error);
       alert(error.message);
     } finally {
       setLoadingId(null);
@@ -195,6 +238,9 @@ export default function PublishedBlogsTable({ blogs }) {
 
                       <button
                         title="Edit"
+                        onClick={() =>
+                          router.push(`/account/edit-blog/${blog.id}`)
+                        }
                         className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-blue-600 hover:text-white"
                       >
                         <FiEdit2 size={16} />
@@ -222,7 +268,9 @@ export default function PublishedBlogsTable({ blogs }) {
 
                       <button
                         title="Delete"
-                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-red-600 hover:text-white"
+                        onClick={() => handleDelete(blog.id)}
+                        disabled={loadingId === blog.id}
+                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
                       >
                         <FiTrash2 size={16} />
                       </button>
