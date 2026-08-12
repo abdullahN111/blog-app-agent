@@ -16,22 +16,35 @@ export const authOptions = {
       },
     }),
   ],
-    session: {
-    strategy: "jwt",  
+
+  session: {
+    strategy: "jwt",
   },
+
   callbacks: {
     async jwt({ token, account }) {
       if (account) {
         token.id_token = account.id_token;
       }
+
+      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+      const modEmail = process.env.NEXT_PUBLIC_MOD_EMAIL;
+
+      token.isAdmin =
+        token.email === adminEmail ||
+        token.email === modEmail;
+
       return token;
     },
+
     async session({ session, token }) {
       session.id_token = token.id_token;
-  
+      session.user.isAdmin = token.isAdmin;
+
       return session;
     },
   },
+
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
