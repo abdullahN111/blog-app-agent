@@ -10,7 +10,7 @@ import {
 } from "react-icons/fi";
 import LikedBlogsTable from "../../components/LikedBlogsTable";
 import PublishedBlogsTable from "../../components/PublishedBlogsTable";
-import SessionExpired from "@/components/SessionExpired";
+import SessionExpired from "../../components/SessionExpired";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
