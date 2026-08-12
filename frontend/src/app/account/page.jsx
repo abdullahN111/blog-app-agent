@@ -10,6 +10,7 @@ import {
 } from "react-icons/fi";
 import LikedBlogsTable from "../../components/LikedBlogsTable";
 import PublishedBlogsTable from "../../components/PublishedBlogsTable";
+import SessionExpired from "@/components/SessionExpired";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,38 +32,56 @@ export default async function AccountPage() {
       </main>
     );
   }
-  async function getMyBlogs(token) {
-    const res = await fetch(`${API_URL}/my-blogs`, {
+
+  async function fetchWithAuth(url, token) {
+    const res = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
       cache: "no-store",
     });
 
-    if (!res.ok) return [];
+    if (res.status === 401) {
+      return {
+        unauthorized: true,
+        data: null,
+      };
+    }
 
-    return res.json();
+    if (!res.ok) {
+      console.error(`API request failed: ${url}`, res.status);
+      return {
+        unauthorized: false,
+        data: null,
+      };
+    }
+
+    return {
+      unauthorized: false,
+      data: await res.json(),
+    };
   }
 
-  async function getLikedBlogs(token) {
-    const res = await fetch(`${API_URL}/liked-blogs`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    });
+  const myBlogsResult = await fetchWithAuth(
+    `${API_URL}/my-blogs`,
+    session.id_token,
+  );
 
-    if (!res.ok) return [];
+  const likedBlogsResult = await fetchWithAuth(
+    `${API_URL}/liked-blogs`,
+    session.id_token,
+  );
 
-    return res.json();
+  if (myBlogsResult.unauthorized || likedBlogsResult.unauthorized) {
+    return <SessionExpired />;
   }
 
   const isAdmin =
     session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
     session.user.email === process.env.NEXT_PUBLIC_MOD_EMAIL;
 
-  const myBlogs = await getMyBlogs(session.id_token);
-  const likedBlogs = await getLikedBlogs(session.id_token);
+  const myBlogs = myBlogsResult.data || [];
+  const likedBlogs = likedBlogsResult.data || [];
 
   return (
     <main className="bg-gray-50 min-h-screen py-10">
@@ -133,7 +152,6 @@ export default async function AccountPage() {
           </div>
         </section>
 
-
         {isAdmin && (
           <section className="mt-20">
             <div className="flex items-center gap-3 mb-7">
@@ -169,7 +187,7 @@ export default async function AccountPage() {
             )}
           </section>
         )}
-           <section className="mt-16">
+        <section className="mt-16">
           <div className="flex items-center gap-3 mb-7">
             <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
               <FiHeart className="text-red-500 text-xl" />

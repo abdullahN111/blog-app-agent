@@ -6,6 +6,7 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+
       authorization: {
         params: {
           scope: "openid email profile",
@@ -16,22 +17,29 @@ export const authOptions = {
       },
     }),
   ],
-    session: {
-    strategy: "jwt",  
+
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
+
   callbacks: {
     async jwt({ token, account }) {
+      // First login
       if (account) {
         token.id_token = account.id_token;
       }
+
       return token;
     },
+
     async session({ session, token }) {
       session.id_token = token.id_token;
-  
+
       return session;
     },
   },
+
   pages: {
     signIn: "/auth/signin",
     error: "/auth/error",
