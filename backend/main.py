@@ -19,7 +19,16 @@ app.add_middleware(
 app.include_router(blog_router)
 app.include_router(agent_router)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+
+STATIC_DIR.mkdir(parents=True, exist_ok=True)
+
+app.mount(
+    "/static",
+    StaticFiles(directory=STATIC_DIR),
+    name="static",
+)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))

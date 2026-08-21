@@ -50,26 +50,33 @@ async def upload_images(
     primary_image: UploadFile = File(...),
     secondary_image: UploadFile = File(None)
 ):
-    os.makedirs("static", exist_ok=True)
-   
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    static_dir = os.path.join(base_dir, "static")
+
+    os.makedirs(static_dir, exist_ok=True)
+
     primary_filename = f"{uuid.uuid4().hex}_{primary_image.filename}"
-    primary_path = os.path.join("static", primary_filename)
-    
+    primary_path = os.path.join(static_dir, primary_filename)
+
     with open(primary_path, "wb") as buffer:
         shutil.copyfileobj(primary_image.file, buffer)
-    
 
     secondary_path = None
+
     if secondary_image:
         secondary_filename = f"{uuid.uuid4().hex}_{secondary_image.filename}"
-        secondary_path = os.path.join("static", secondary_filename)
-        
+        secondary_path = os.path.join(static_dir, secondary_filename)
+
         with open(secondary_path, "wb") as buffer:
             shutil.copyfileobj(secondary_image.file, buffer)
-    
+
     return {
-        "primary": primary_path,
-        "secondary": secondary_path
+        "primary": f"static/{primary_filename}",
+        "secondary": (
+            f"static/{secondary_filename}"
+            if secondary_image
+            else None
+        ),
     }
     
 @router.get("/blogs", response_model=List[models.BlogModel])
