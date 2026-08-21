@@ -7,7 +7,7 @@ export default function SessionExpired() {
     <main className="min-h-[70vh] flex items-center justify-center px-6">
       <div className="bg-white rounded-3xl shadow-xl p-10 text-center max-w-lg border">
         <h1 className="text-3xl font-bold text-primary">
-          Your session has expired
+          Your session has expired.
         </h1>
 
         <p className="text-gray-500 mt-4">
