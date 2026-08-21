@@ -1,20 +1,27 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ViewTracker({ blogId }) {
-  useEffect(() => {
-    const key = `viewed-${blogId}`;
+  const { data: session, status } = useSession();
 
-    if (sessionStorage.getItem(key)) return;
+  useEffect(() => {
+    
+    if (status === "loading") return;
+
+
+    if (!session?.id_token) return;
 
     const trackView = async () => {
       try {
         const res = await fetch(`${API_URL}/blogs/${blogId}/view`, {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.id_token}`,
+          },
         });
 
         if (!res.ok) {
@@ -22,14 +29,16 @@ export default function ViewTracker({ blogId }) {
           return;
         }
 
-        sessionStorage.setItem(key, "true");
-      } catch (err) {
-        console.error("View tracking failed:", err);
+        const data = await res.json();
+
+        console.log("View tracking:", data);
+      } catch (error) {
+        console.error("View tracking failed:", error);
       }
     };
 
     trackView();
-  }, [blogId]);
+  }, [blogId, session, status]);
 
   return null;
 }

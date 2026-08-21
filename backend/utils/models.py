@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from pydantic import BaseModel
@@ -74,7 +74,38 @@ class LikedBlog(Base):
     user = relationship("User", backref="favorites")
 
 
+class BlogView(Base):
+    __tablename__ = "blog_views"
 
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False
+    )
+
+    blog_id = Column(
+        Integer,
+        ForeignKey("blogs.id"),
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now()
+    )
+
+    user = relationship("User", backref="blog_views")
+    blog = relationship("Blog", backref="view_records")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "blog_id",
+            name="uq_user_blog_view"
+        ),
+    )
 
 class BlogBase(BaseModel):
     title: str

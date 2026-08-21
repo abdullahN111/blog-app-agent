@@ -318,16 +318,58 @@ async def get_like_count(blog_id: int, db: db_dependency):
 
 
 @router.post("/blogs/{blog_id}/view")
-async def increment_view(blog_id: int, db: db_dependency):
-    blog = db.query(models.Blog).filter(models.Blog.id == blog_id).first()
+async def record_blog_view(
+    blog_id: int,
+    db: db_dependency,
+    user: models.User = Depends(get_current_user)
+):
+    blog = (
+        db.query(models.Blog)
+        .filter(
+            models.Blog.id == blog_id,
+            models.Blog.published.is_(True)
+        )
+        .first()
+    )
 
     if not blog:
-        raise HTTPException(status_code=404, detail="Blog not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Blog not found"
+        )
+
+    existing_view = (
+        db.query(models.BlogView)
+        .filter(
+            models.BlogView.user_id == user.id,
+            models.BlogView.blog_id == blog_id
+        )
+        .first()
+    )
+
+    if existing_view:
+        return {
+            "viewed": True,
+            "new_view": False,
+            "views": blog.views
+        }
+
+    new_view = models.BlogView(
+        user_id=user.id,
+        blog_id=blog_id
+    )
+
+    db.add(new_view)
 
     blog.views += 1
+
     db.commit()
 
-    return {"views": blog.views}
+    return {
+        "viewed": True,
+        "new_view": True,
+        "views": blog.views
+    }
 
 
 @router.get("/my-blogs", response_model=List[models.BlogModel])
