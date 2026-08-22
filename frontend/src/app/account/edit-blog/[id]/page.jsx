@@ -11,6 +11,7 @@ import {
   FiSave,
 } from "react-icons/fi";
 import { categories } from "../../../../../public/assets/blogRelatedData";
+import { generateSlug } from "@/utils/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -51,7 +52,7 @@ export default function EditBlogPage() {
 
         const response = await fetch(`${API_URL}/blogs/id/${id}`, {
           headers: {
-            Authorization: `Bearer ${session.id_token}`,
+            Authorization: `Bearer ${session.backendToken}`,
           },
           cache: "no-store",
         });
@@ -163,7 +164,7 @@ export default function EditBlogPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
         body: JSON.stringify({
           title: formData.title,
@@ -254,7 +255,6 @@ export default function EditBlogPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
 
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-higher rounded-full mb-4">
@@ -367,7 +367,7 @@ export default function EditBlogPage() {
                     <option value="">Select a category</option>
 
                     {categories.map((category) => (
-                      <option key={category} value={category}>
+                      <option key={category} value={generateSlug(category)}>
                         {category}
                       </option>
                     ))}

@@ -69,7 +69,7 @@ export default function CreateBlog() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
         body: JSON.stringify({
           title: formData.topic,

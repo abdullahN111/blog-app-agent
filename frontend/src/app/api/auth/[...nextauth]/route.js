@@ -1,46 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-
-async function refreshAccessToken(token) {
-  try {
-    const response = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        grant_type: "refresh_token",
-        refresh_token: token.refresh_token,
-      }),
-    });
-
-    const refreshedTokens = await response.json();
-
-    if (!response.ok) {
-      throw refreshedTokens;
-    }
-
-    return {
-      ...token,
-      access_token: refreshedTokens.access_token,
-      id_token: refreshedTokens.id_token ?? token.id_token,
-      expires_at:
-        Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
-      refresh_token:
-        refreshedTokens.refresh_token ?? token.refresh_token,
-      error: undefined,
-    };
-  } catch (error) {
-    console.error("Error refreshing Google access token:", error);
-
-    return {
-      ...token,
-      error: "RefreshAccessTokenError",
-    };
-  }
-}
+import jwt from "jsonwebtoken";
 
 export const authOptions = {
   providers: [
@@ -51,8 +11,8 @@ export const authOptions = {
       authorization: {
         params: {
           scope: "openid email profile",
-          access_type: "offline",
           prompt: "consent",
+          access_type: "offline",
           response_type: "code",
         },
       },
@@ -65,37 +25,35 @@ export const authOptions = {
   },
 
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, profile }) {
+      
+      if (account && profile) {
+        token.email = profile.email;
+        token.name = profile.name;
+        token.picture = profile.picture;
 
-      if (account) {
-        return {
-          ...token,
-
-          access_token: account.access_token,
-          id_token: account.id_token,
-
-          expires_at: account.expires_at,
-
-          refresh_token: account.refresh_token,
-
-          error: undefined,
-        };
+       
+        token.backendToken = jwt.sign(
+          {
+            email: profile.email,
+            name: profile.name,
+          },
+          process.env.NEXTAUTH_SECRET,
+          {
+            expiresIn: "30d",
+          }
+        );
       }
 
-      if (
-        token.expires_at &&
-        Date.now() < token.expires_at * 1000
-      ) {
-        return token;
-      }
-
-      return refreshAccessToken(token);
+      return token;
     },
 
     async session({ session, token }) {
-      session.id_token = token.id_token;
-      session.access_token = token.access_token;
-      session.error = token.error;
+      session.user.email = token.email;
+      session.user.name = token.name;
+      session.user.image = token.picture;
+
+      session.backendToken = token.backendToken;
 
       return session;
     },

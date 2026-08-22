@@ -17,7 +17,7 @@ export default function CommentList({ comments }) {
       const res = await authFetch(`${API_URL}/comments/${commentId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
       });
       if (!res) return;

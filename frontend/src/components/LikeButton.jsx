@@ -20,7 +20,7 @@ export default function LikeButton({ blogId }) {
     async function loadLiked() {
       const res = await authFetch(`${API_URL}/liked-blogs/${blogId}`, {
         headers: {
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
       });
       if (!res) return;
@@ -44,7 +44,7 @@ export default function LikeButton({ blogId }) {
       const res = await authFetch(`${API_URL}/liked-blogs/${blogId}`, {
         method: liked ? "DELETE" : "POST",
         headers: {
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
       });
 

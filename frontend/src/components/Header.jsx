@@ -30,7 +30,7 @@ export default function Header() {
 
   const toggleMore = () => setIsMoreOpen(!isMoreOpen);
 
-  // console.log(session.id_token);
+  // console.log(session.backendToken);
 
   const isAdmin =
     session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ||

@@ -35,7 +35,7 @@ export default function CommentForm({ blogId }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.id_token}`,
+          Authorization: `Bearer ${session.backendToken}`,
         },
         body: JSON.stringify({
           blog_id: Number(blogId),

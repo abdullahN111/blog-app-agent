@@ -40,3 +40,4 @@ urllib3==2.5.0
 uvicorn==0.35.0
 fastapi[standard]
 psycopg2-binary
+PyJWT
