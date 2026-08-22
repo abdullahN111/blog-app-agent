@@ -11,7 +11,7 @@ import {
   FiSave,
 } from "react-icons/fi";
 import { categories } from "../../../../../public/assets/blogRelatedData";
-import { generateSlug } from "@/utils/utils";
+import { generateSlug } from "../../../../utils/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 

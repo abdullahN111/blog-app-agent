@@ -1,12 +1,12 @@
 # auth.py
+
 from fastapi import Depends, HTTPException, status, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from google.oauth2 import id_token
-from google.auth.transport import requests
 from sqlalchemy.orm import Session
 from utils.models import User, get_db
 from dotenv import load_dotenv
 import os
+import jwt
 import logging
 
 load_dotenv()
@@ -14,10 +14,10 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+NEXTAUTH_SECRET = os.getenv("NEXTAUTH_SECRET")
 
-# Use HTTPBearer for better Swagger UI support
 security = HTTPBearer()
+
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Security(security),
@@ -25,41 +25,72 @@ def get_current_user(
 ):
     try:
         token = credentials.credentials
-        
-        # Verify the token
-        idinfo = id_token.verify_oauth2_token(
-            token, 
-            requests.Request(), 
-            GOOGLE_CLIENT_ID,
-            clock_skew_in_seconds=10 
+
+        if not NEXTAUTH_SECRET:
+            logger.error("NEXTAUTH_SECRET is missing")
+            raise HTTPException(
+                status_code=500,
+                detail="Authentication configuration error"
+            )
+
+        # Verify our backend JWT
+        payload = jwt.decode(
+            token,
+            NEXTAUTH_SECRET,
+            algorithms=["HS256"]
         )
-        
-        if idinfo['aud'] != GOOGLE_CLIENT_ID:
-            raise HTTPException(status_code=401, detail="Invalid audience")
-            
-        email = idinfo.get("email")
-        name = idinfo.get("name")
+
+        email = payload.get("email")
+        name = payload.get("name")
 
         if not email:
-            raise HTTPException(status_code=401, detail="Invalid Google token")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication token"
+            )
 
-        user = db.query(User).filter(User.email == email).first()
+        # Find user in database
+        user = (
+            db.query(User)
+            .filter(User.email == email)
+            .first()
+        )
+
+        # Create user if they don't exist
         if not user:
-            user = User(name=name, email=email)
+            user = User(
+                name=name or email.split("@")[0],
+                email=email
+            )
+
             db.add(user)
             db.commit()
             db.refresh(user)
 
         return user
 
-    except ValueError as e:
-        logger.error(f"Token validation error: {e}")
+    except jwt.ExpiredSignatureError:
+        logger.warning("Backend authentication token expired")
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token expired"
+        )
+
+    except jwt.InvalidTokenError as e:
+        logger.warning(f"Invalid backend token: {e}")
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials"
         )
+
+    except HTTPException:
+        raise
+
     except Exception as e:
         logger.error(f"Authentication error: {e}")
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed"
