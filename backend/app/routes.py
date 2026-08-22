@@ -3,22 +3,17 @@ import shutil
 from typing import List
 import uuid
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from utils import models
 from utils.database import engine
 from typing import Annotated
 from utils.auth import get_current_user  
 from utils.utils import generate_slug  
-from utils.auth import verify_google_and_get_or_create_user, create_backend_token
 
 db_dependency = Annotated[Session, Depends(models.get_db)]
 models.Base.metadata.create_all(bind=engine)
 
 router = APIRouter()
-
-class GoogleLoginRequest(BaseModel):
-    id_token: str
 
  
 
@@ -565,14 +560,3 @@ async def update_blog(
     db.refresh(blog)
 
     return blog
-
-
-@router.post("/auth/google")
-async def google_login(body: GoogleLoginRequest, db: db_dependency):
-    user = verify_google_and_get_or_create_user(body.id_token, db)
-    token = create_backend_token(user)
-
-    return {
-        "access_token": token,
-        "user": {"id": user.id, "email": user.email, "name": user.name},
-    }

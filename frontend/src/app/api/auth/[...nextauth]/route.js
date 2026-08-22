@@ -1,16 +1,59 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+async function refreshAccessToken(token) {
+  try {
+    const response = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        grant_type: "refresh_token",
+        refresh_token: token.refresh_token,
+      }),
+    });
+
+    const refreshedTokens = await response.json();
+
+    if (!response.ok) {
+      throw refreshedTokens;
+    }
+
+    return {
+      ...token,
+      access_token: refreshedTokens.access_token,
+      id_token: refreshedTokens.id_token ?? token.id_token,
+      expires_at:
+        Math.floor(Date.now() / 1000) + refreshedTokens.expires_in,
+      refresh_token:
+        refreshedTokens.refresh_token ?? token.refresh_token,
+      error: undefined,
+    };
+  } catch (error) {
+    console.error("Error refreshing Google access token:", error);
+
+    return {
+      ...token,
+      error: "RefreshAccessTokenError",
+    };
+  }
+}
 
 export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+
       authorization: {
         params: {
           scope: "openid email profile",
+          access_type: "offline",
+          prompt: "consent",
+          response_type: "code",
         },
       },
     }),
@@ -23,36 +66,37 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, account }) {
-      // Only runs once, right after Google sign-in
-      if (account?.id_token) {
-        try {
-          const res = await fetch(`${API_URL}/auth/google`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id_token: account.id_token }),
-          });
 
-          if (!res.ok) throw new Error("Backend auth exchange failed");
+      if (account) {
+        return {
+          ...token,
 
-          const data = await res.json();
+          access_token: account.access_token,
+          id_token: account.id_token,
 
-          return {
-            ...token,
-            id_token: data.access_token, // NOTE: now holds OUR backend JWT, not Google's
-            error: undefined,
-          };
-        } catch (err) {
-          console.error("Error exchanging Google token for backend JWT:", err);
-          return { ...token, error: "BackendAuthError" };
-        }
+          expires_at: account.expires_at,
+
+          refresh_token: account.refresh_token,
+
+          error: undefined,
+        };
       }
 
-      return token;
+      if (
+        token.expires_at &&
+        Date.now() < token.expires_at * 1000
+      ) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
 
     async session({ session, token }) {
-      session.id_token = token.id_token; // backend JWT, valid 30 days
+      session.id_token = token.id_token;
+      session.access_token = token.access_token;
       session.error = token.error;
+
       return session;
     },
   },
@@ -64,4 +108,5 @@ export const authOptions = {
 };
 
 const handler = NextAuth(authOptions);
+
 export { handler as GET, handler as POST };
