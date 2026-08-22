@@ -10,7 +10,7 @@ from utils.database import engine
 from typing import Annotated
 from utils.auth import get_current_user  
 from utils.utils import generate_slug  
-from auth import verify_google_and_get_or_create_user, create_backend_token
+from utils.auth import verify_google_and_get_or_create_user, create_backend_token
 
 db_dependency = Annotated[Session, Depends(models.get_db)]
 models.Base.metadata.create_all(bind=engine)
