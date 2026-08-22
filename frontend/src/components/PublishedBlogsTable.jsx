@@ -35,7 +35,7 @@ export default function PublishedBlogsTable({ blogs }) {
       const response = await fetch(`${API_URL}/blogs/${blogId}/unpublish`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${session.backendToken}`,
+          Authorization: `Bearer ${session.id_token}`,
         },
       });
 
@@ -70,7 +70,7 @@ export default function PublishedBlogsTable({ blogs }) {
       const response = await fetch(`${API_URL}/blogs/${blogId}/publish`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${session.backendToken}`,
+          Authorization: `Bearer ${session.id_token}`,
         },
       });
 
@@ -113,7 +113,7 @@ export default function PublishedBlogsTable({ blogs }) {
       const response = await fetch(`${API_URL}/blogs/${blogId}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${session.backendToken}`,
+          Authorization: `Bearer ${session.id_token}`,
         },
       });
 

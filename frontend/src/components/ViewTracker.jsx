@@ -20,7 +20,7 @@ export default function ViewTracker({ blogId }) {
         const res = await fetch(`${API_URL}/blogs/${blogId}/view`, {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${session.backendToken}`,
+            Authorization: `Bearer ${session.id_token}`,
           },
         });
 

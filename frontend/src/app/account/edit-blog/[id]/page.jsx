@@ -52,7 +52,7 @@ export default function EditBlogPage() {
 
         const response = await fetch(`${API_URL}/blogs/id/${id}`, {
           headers: {
-            Authorization: `Bearer ${session.backendToken}`,
+            Authorization: `Bearer ${session.id_token}`,
           },
           cache: "no-store",
         });
@@ -164,7 +164,7 @@ export default function EditBlogPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.backendToken}`,
+          Authorization: `Bearer ${session.id_token}`,
         },
         body: JSON.stringify({
           title: formData.title,

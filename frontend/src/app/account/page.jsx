@@ -64,12 +64,12 @@ export default async function AccountPage() {
 
   const myBlogsResult = await fetchWithAuth(
     `${API_URL}/my-blogs`,
-    session.backendToken,
+    session.id_token,
   );
 
   const likedBlogsResult = await fetchWithAuth(
     `${API_URL}/liked-blogs`,
-    session.backendToken,
+    session.id_token,
   );
 
   if (myBlogsResult.unauthorized || likedBlogsResult.unauthorized) {

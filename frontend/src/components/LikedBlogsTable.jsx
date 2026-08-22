@@ -19,7 +19,7 @@ export default function LikedBlogsTable({ blogs }) {
     const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${session.backendToken}`,
+        Authorization: `Bearer ${session.id_token}`,
       },
     }); 
 
