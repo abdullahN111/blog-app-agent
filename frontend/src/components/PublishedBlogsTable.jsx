@@ -184,10 +184,11 @@ export default function PublishedBlogsTable({ blogs }) {
                   <td className="px-7 py-6">
                     <div className="flex items-center gap-5">
                       <Image
-                        src={`${API_URL}/${blog.primary_image.replace(
-                          /\\/g,
-                          "/",
-                        )}`}
+                        src={
+                          blog.primary_image.startsWith("http")
+                            ? blog.primary_image
+                            : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
+                        }
                         alt={blog.title}
                         width={120}
                         height={78}

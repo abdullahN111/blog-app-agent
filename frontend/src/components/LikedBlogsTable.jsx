@@ -15,26 +15,24 @@ export default function LikedBlogsTable({ blogs }) {
 
   const removeLiked = async (blogId) => {
     if (!session) return;
-  try {
-    const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${session.id_token}`,
-      },
-    }); 
+    try {
+      const res = await fetch(`${API_URL}/liked-blogs/${blogId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.id_token}`,
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error("Failed to remove blog");
+      if (!res.ok) {
+        throw new Error("Failed to remove blog");
+      }
+
+      setLikedBlogs((prev) => prev.filter((blog) => blog.id !== blogId));
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    setLikedBlogs((prev) =>
-      prev.filter((blog) => blog.id !== blogId)
-    );
-  } catch (err) {
-    console.error(err);
-  }
-};
-  
   if (!likedBlogs.length) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center shadow-sm">
@@ -83,10 +81,11 @@ export default function LikedBlogsTable({ blogs }) {
                   <td className="px-7 py-6">
                     <div className="flex items-center gap-5">
                       <Image
-                        src={`${API_URL}/${blog.primary_image.replace(
-                          /\\/g,
-                          "/",
-                        )}`}
+                        src={
+                          blog.primary_image.startsWith("http")
+                            ? blog.primary_image
+                            : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
+                        }
                         alt={blog.title}
                         width={120}
                         height={78}
@@ -135,11 +134,11 @@ export default function LikedBlogsTable({ blogs }) {
                       </Link>
 
                       <button
-  onClick={() => removeLiked(blog.id)}
-  className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700 cursor-pointer"
->
-  Remove
-</button>
+                        onClick={() => removeLiked(blog.id)}
+                        className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700 cursor-pointer"
+                      >
+                        Remove
+                      </button>
                     </div>
                   </td>
                 </tr>
