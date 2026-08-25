@@ -62,9 +62,9 @@ export default async function BlogPage({ params }) {
             <div className="relative h-80 w-full rounded-xl overflow-hidden mb-4">
               <Image
                 src={
-                  imagePath.startsWith("http")
-                    ? imagePath
-                    : `${API_URL}/${imagePath.replace(/\\/g, "/")}`
+                  blog.primary_image.startsWith("http")
+                    ? blog.primary_image
+                    : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
                 }
                 alt={blog.title}
                 fill
@@ -116,9 +116,9 @@ export default async function BlogPage({ params }) {
                 <div className="my-8 rounded-xl overflow-hidden">
                   <Image
                     src={
-                      imagePath.startsWith("http")
-                        ? imagePath
-                        : `${API_URL}/${imagePath.replace(/\\/g, "/")}`
+                      blog.secondary_image.startsWith("http")
+                        ? blog.secondary_image
+                        : `${API_URL}/${blog.secondary_image.replace(/\\/g, "/")}`
                     }
                     alt={`${blog.title} - Additional content`}
                     width={800}
