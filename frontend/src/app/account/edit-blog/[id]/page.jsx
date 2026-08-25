@@ -255,7 +255,6 @@ export default function EditBlogPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-higher rounded-full mb-4">
             <FiFileText className="w-8 h-8 text-blue-600" />
@@ -462,10 +461,11 @@ export default function EditBlogPage() {
                     </p>
 
                     <img
-                      src={`${API_URL}/${existingImages.primary.replace(
-                        /\\/g,
-                        "/",
-                      )}`}
+                      src={
+                        existingImages.primary.startsWith("http")
+                          ? existingImages.primary
+                          : `${API_URL}/${existingImages.primary.replace(/\\/g, "/")}`
+                      }
                       alt="Current primary"
                       className="w-full max-w-md h-48 object-cover rounded-lg border"
                     />
@@ -501,10 +501,11 @@ export default function EditBlogPage() {
                     </p>
 
                     <img
-                      src={`${API_URL}/${existingImages.secondary.replace(
-                        /\\/g,
-                        "/",
-                      )}`}
+                      src={
+                        existingImages.primary.startsWith("http")
+                          ? existingImages.primary
+                          : `${API_URL}/${existingImages.primary.replace(/\\/g, "/")}`
+                      }
                       alt="Current secondary"
                       className="w-full max-w-md h-48 object-cover rounded-lg border"
                     />

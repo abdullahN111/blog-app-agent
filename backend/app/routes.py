@@ -8,7 +8,17 @@ from utils import models
 from utils.database import engine
 from typing import Annotated
 from utils.auth import get_current_user  
-from utils.utils import generate_slug  
+from utils.utils import generate_slug, extract_cloudinary_public_id
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
+
 
 db_dependency = Annotated[Session, Depends(models.get_db)]
 models.Base.metadata.create_all(bind=engine)
@@ -45,38 +55,34 @@ async def create_blog(blog: models.BlogCreate,
     return new_blog
 
 
+
+
 @router.post("/upload-images")
 async def upload_images(
     primary_image: UploadFile = File(...),
     secondary_image: UploadFile = File(None)
 ):
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    static_dir = os.path.join(base_dir, "static")
-
-    os.makedirs(static_dir, exist_ok=True)
-
-    primary_filename = f"{uuid.uuid4().hex}_{primary_image.filename}"
-    primary_path = os.path.join(static_dir, primary_filename)
-
-    with open(primary_path, "wb") as buffer:
-        shutil.copyfileobj(primary_image.file, buffer)
-
-    secondary_path = None
-
+    try:
+        primary_result = cloudinary.uploader.upload(
+            primary_image.file,
+            folder="blog_images",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Primary image upload failed: {e}")
+    secondary_url = None
+    
     if secondary_image:
-        secondary_filename = f"{uuid.uuid4().hex}_{secondary_image.filename}"
-        secondary_path = os.path.join(static_dir, secondary_filename)
-
-        with open(secondary_path, "wb") as buffer:
-            shutil.copyfileobj(secondary_image.file, buffer)
-
+        try:
+            secondary_result = cloudinary.uploader.upload(
+                secondary_image.file,
+                folder="blog_images",
+            )
+            secondary_url = secondary_result["secure_url"]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Secondary image upload failed: {e}")
     return {
-        "primary": f"static/{primary_filename}",
-        "secondary": (
-            f"static/{secondary_filename}"
-            if secondary_image
-            else None
-        ),
+        "primary": primary_result["secure_url"],
+        "secondary": secondary_url,
     }
     
 @router.get("/blogs", response_model=List[models.BlogModel])
@@ -483,14 +489,24 @@ async def delete_blog(
         models.Comment.blog_id == blog_id
     ).delete(synchronize_session=False)
 
-
+    # Clean up images — Cloudinary URLs and legacy local files both handled
     for image_path in [blog.primary_image, blog.secondary_image]:
-        if image_path:
-            image_file = image_path.replace("\\", "/")
+        if not image_path:
+            continue
 
-            if image_file.startswith("static/"):
-                if os.path.exists(image_file):
-                    os.remove(image_file)
+        if image_path.startswith("http"):
+            # Cloudinary-hosted image
+            public_id = extract_cloudinary_public_id(image_path)
+            if public_id:
+                try:
+                    cloudinary.uploader.destroy(public_id)
+                except Exception as e:
+                    print(f"Failed to delete Cloudinary image {public_id}: {e}")
+        else:
+            # Legacy local file (old blogs, pre-Cloudinary)
+            image_file = image_path.replace("\\", "/")
+            if image_file.startswith("static/") and os.path.exists(image_file):
+                os.remove(image_file)
 
     db.delete(blog)
     db.commit()
@@ -498,7 +514,6 @@ async def delete_blog(
     return {
         "message": "Blog deleted successfully"
     }
-    
 
 @router.put("/blogs/{blog_id}", response_model=models.BlogModel)
 async def update_blog(
