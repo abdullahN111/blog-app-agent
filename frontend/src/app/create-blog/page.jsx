@@ -54,6 +54,11 @@ export default function CreateBlog() {
         body: formDataToSend,
       });
 
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => null);
+        throw new Error(errorData?.detail || "Image upload failed");
+      }
+
       const imagePaths = await uploadResponse.json();
       const agentResponse = await fetch(`${API_URL}/agent`, {
         method: "POST",
