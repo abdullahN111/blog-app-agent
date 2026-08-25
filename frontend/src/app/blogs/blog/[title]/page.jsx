@@ -61,7 +61,11 @@ export default async function BlogPage({ params }) {
           <header className="mb-8">
             <div className="relative h-80 w-full rounded-xl overflow-hidden mb-4">
               <Image
-                src={`${API_URL}/${blog.primary_image.replace("\\", "/")}`}
+                src={
+                  imagePath.startsWith("http")
+                    ? imagePath
+                    : `${API_URL}/${imagePath.replace(/\\/g, "/")}`
+                }
                 alt={blog.title}
                 fill
                 className="object-cover"
@@ -111,10 +115,11 @@ export default async function BlogPage({ params }) {
               {blog.secondary_image && (
                 <div className="my-8 rounded-xl overflow-hidden">
                   <Image
-                    src={`${API_URL}/${blog.secondary_image.replace(
-                      "\\",
-                      "/",
-                    )}`}
+                    src={
+                      imagePath.startsWith("http")
+                        ? imagePath
+                        : `${API_URL}/${imagePath.replace(/\\/g, "/")}`
+                    }
                     alt={`${blog.title} - Additional content`}
                     width={800}
                     height={400}

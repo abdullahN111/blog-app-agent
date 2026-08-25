@@ -12,9 +12,9 @@ export default function BlogCard({ blog }) {
       <div className="relative h-56 w-full">
         <Image
           src={
-            blog.primary_image
-              ? `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
-              : "/null-image.webp"
+            imagePath.startsWith("http")
+              ? imagePath
+              : `${API_URL}/${imagePath.replace(/\\/g, "/")}`
           }
           alt={blog.title}
           fill
