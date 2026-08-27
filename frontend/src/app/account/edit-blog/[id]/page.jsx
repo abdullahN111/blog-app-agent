@@ -48,7 +48,6 @@ export default function EditBlogPage() {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-       
 
         const response = await fetch(`${API_URL}/blogs/id/${id}`, {
           headers: {
@@ -116,7 +115,6 @@ export default function EditBlogPage() {
     }
 
     setButtonState("loading");
-    setError("");
 
     try {
       let primaryImage = existingImages.primary;
@@ -232,13 +230,11 @@ export default function EditBlogPage() {
     );
   }
 
-  if (error && !formData.title) {
+  if (!formData.title) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-primary">Blog not found</h1>
-
-          <p className="text-gray-500 mt-3">{error}</p>
 
           <button
             onClick={() => router.push("/account")}
@@ -526,12 +522,6 @@ export default function EditBlogPage() {
                 </p>
               </div>
             </div>
-
-            {error && (
-              <div className="mt-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
-                {error}
-              </div>
-            )}
 
             <div className="mt-8 pt-6 border-t border-gray-200">
               <button
