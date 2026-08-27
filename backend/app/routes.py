@@ -489,6 +489,10 @@ async def delete_blog(
         models.Comment.blog_id == blog_id
     ).delete(synchronize_session=False)
 
+    db.query(models.BlogView).filter(
+    models.BlogView.blog_id == blog_id
+    ).delete(synchronize_session=False)
+
     # Clean up images — Cloudinary URLs and legacy local files both handled
     for image_path in [blog.primary_image, blog.secondary_image]:
         if not image_path:
