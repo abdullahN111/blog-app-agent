@@ -12,6 +12,7 @@ import {
 } from "react-icons/fi";
 import { categories } from "../../../../../public/assets/blogRelatedData";
 import { generateSlug } from "../../../../utils/utils";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -22,7 +23,6 @@ export default function EditBlogPage() {
 
   const [loading, setLoading] = useState(true);
   const [buttonState, setButtonState] = useState("idle");
-  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -48,7 +48,7 @@ export default function EditBlogPage() {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        setError("");
+       
 
         const response = await fetch(`${API_URL}/blogs/id/${id}`, {
           headers: {
@@ -82,7 +82,7 @@ export default function EditBlogPage() {
         });
       } catch (error) {
         console.error("Error loading blog:", error);
-        setError("Unable to load this blog.");
+        toast.error("Unable to load this blog.");
       } finally {
         setLoading(false);
       }
@@ -111,7 +111,7 @@ export default function EditBlogPage() {
     e.preventDefault();
 
     if (!session) {
-      setError("Please login first.");
+      toast.error("Please login first.");
       return;
     }
 
@@ -201,7 +201,7 @@ export default function EditBlogPage() {
     } catch (error) {
       console.error("Error updating blog:", error);
 
-      setError(error.message || "Something went wrong.");
+      toast.error(error.message || "Something went wrong.");
 
       setButtonState("idle");
     }

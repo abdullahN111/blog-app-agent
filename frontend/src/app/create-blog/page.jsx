@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { FiArrowRight, FiBookOpen, FiCheck, FiLoader } from "react-icons/fi";
 import { categories } from "../../../public/assets/blogRelatedData";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -39,6 +40,7 @@ export default function CreateBlog() {
   const handleSubmit = async (e) => {
     if (!session) {
       setButtonState("Please login first.");
+      toast.error("Please login first.");
       return;
     }
     e.preventDefault();
@@ -93,6 +95,7 @@ export default function CreateBlog() {
       if (blogResponse.ok) {
         console.log("Blog created successfully!");
         setButtonState("success");
+        toast.success("Blog created successfully!");
         setTimeout(() => {
           setFormData({
             topic: "",
@@ -112,6 +115,7 @@ export default function CreateBlog() {
       }
     } catch (error) {
       console.error("Error creating blog:", error);
+      toast.error("Failed to create blog");
       setButtonState("idle");
     }
   };

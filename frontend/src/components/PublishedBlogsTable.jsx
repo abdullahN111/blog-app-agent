@@ -14,18 +14,20 @@ import { generateSlug } from "../utils/utils";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function PublishedBlogsTable({ blogs }) {
   const [blogList, setBlogList] = useState(blogs);
   const [loadingId, setLoadingId] = useState(null);
+  const [deleteBlogId, setDeleteBlogId] = useState(null);
   const { data: session } = useSession();
   const router = useRouter();
 
   const handleUnpublish = async (blogId) => {
     if (!session?.id_token) {
-      alert("Please login again.");
+      toast.error("Please login again.");
       return;
     }
 
@@ -52,7 +54,6 @@ export default function PublishedBlogsTable({ blogs }) {
       );
     } catch (error) {
       console.error("Unpublish error:", error);
-      alert(error.message);
     } finally {
       setLoadingId(null);
     }
@@ -60,7 +61,7 @@ export default function PublishedBlogsTable({ blogs }) {
 
   const handlePublish = async (blogId) => {
     if (!session?.id_token) {
-      alert("Please login again.");
+      toast.error("Please login again.");
       return;
     }
 
@@ -87,7 +88,7 @@ export default function PublishedBlogsTable({ blogs }) {
       );
     } catch (error) {
       console.error("Publish error:", error);
-      alert(error.message);
+      // alert(error.message);
     } finally {
       setLoadingId(null);
     }
@@ -95,15 +96,7 @@ export default function PublishedBlogsTable({ blogs }) {
 
   const handleDelete = async (blogId) => {
     if (!session?.id_token) {
-      alert("Please login again.");
-      return;
-    }
-
-    const confirmed = window.confirm(
-      "Are you sure you want to permanently delete this blog? This action cannot be undone.",
-    );
-
-    if (!confirmed) {
+      toast.error("Please login again.");
       return;
     }
 
@@ -126,11 +119,14 @@ export default function PublishedBlogsTable({ blogs }) {
       setBlogList((currentBlogs) =>
         currentBlogs.filter((blog) => blog.id !== blogId),
       );
+
+      toast.success("Blog deleted successfully.");
     } catch (error) {
       console.error("Delete error:", error);
-      alert(error.message);
+      toast.error(error.message || "Failed to delete blog.");
     } finally {
       setLoadingId(null);
+      setDeleteBlogId(null);
     }
   };
 
@@ -269,7 +265,7 @@ export default function PublishedBlogsTable({ blogs }) {
 
                       <button
                         title="Delete"
-                        onClick={() => handleDelete(blog.id)}
+                        onClick={() => setDeleteBlogId(blog.id)}
                         disabled={loadingId === blog.id}
                         className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
                       >
@@ -283,6 +279,42 @@ export default function PublishedBlogsTable({ blogs }) {
           </tbody>
         </table>
       </div>
+      ```jsx
+      {deleteBlogId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-xl font-semibold text-slate-900">
+              Delete this blog?
+            </h3>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              This action cannot be undone. The blog and its associated images
+              will be permanently deleted.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setDeleteBlogId(null)}
+                disabled={loadingId === deleteBlogId}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteBlogId)}
+                disabled={loadingId === deleteBlogId}
+                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loadingId === deleteBlogId ? "Deleting..." : "Delete Blog"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      ```
     </div>
   );
 }

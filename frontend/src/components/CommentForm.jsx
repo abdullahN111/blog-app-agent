@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { authFetch } from "../utils/authFetch";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -12,19 +13,17 @@ export default function CommentForm({ blogId }) {
 
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (!session) {
-      setError("You must be logged in to comment");
+      toast.error("You must be logged in to comment");
       return;
     }
 
     if (!text.trim()) {
-      setError("Comment cannot be empty");
+      toast.error("Comment cannot be empty");
       return;
     }
 
@@ -56,7 +55,7 @@ export default function CommentForm({ blogId }) {
       setText("");
       window.location.reload();
     } catch (err) {
-      setError(err.message || "Failed to post comment");
+      toast.error(err.message || "Failed to post comment");
       console.error("Comment submission error:", err);
     } finally {
       setLoading(false);

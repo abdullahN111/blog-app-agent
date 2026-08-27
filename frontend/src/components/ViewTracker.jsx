@@ -29,9 +29,9 @@ export default function ViewTracker({ blogId }) {
           return;
         }
 
-        const data = await res.json();
+        // const data = await res.json();
 
-        console.log("View tracking:", data);
+        // console.log("View tracking:", data);
       } catch (error) {
         console.error("View tracking failed:", error);
       }
