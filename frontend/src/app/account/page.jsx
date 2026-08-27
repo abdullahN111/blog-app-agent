@@ -81,7 +81,13 @@ export default async function AccountPage() {
     session.user.email === process.env.NEXT_PUBLIC_MOD_EMAIL;
 
   const myBlogs = myBlogsResult.data || [];
+  const publishedBlogs = await fetch(`${API_URL}/blogs`, {
+    cache: "no-store",
+  });
   const likedBlogs = likedBlogsResult.data || [];
+
+  const publishedBlogData = await publishedBlogs.json();
+  const totalPublishedBlogs = publishedBlogData.length;
 
   return (
     <main className="bg-gray-50 min-h-screen py-10">
@@ -138,7 +144,7 @@ export default async function AccountPage() {
               <p className="text-gray-500">Published Blogs</p>
 
               <h2 className="text-4xl font-bold mt-2 text-primary">
-                {myBlogs.length}
+                {totalPublishedBlogs}
               </h2>
             </div>
           )}
