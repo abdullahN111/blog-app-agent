@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import { authFetch } from "../utils/authFetch";
+import { toast } from "sonner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -12,7 +13,6 @@ export default function LikeButton({ blogId }) {
   const { data: session } = useSession();
 
   const [liked, setLiked] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!session) return;
@@ -36,7 +36,7 @@ export default function LikeButton({ blogId }) {
 
   async function handleLike() {
     if (!session) {
-      setError("Please login first.");
+      toast.error("Please login first.");
       return;
     }
 
@@ -54,7 +54,7 @@ export default function LikeButton({ blogId }) {
         setLiked(!liked);
       }
     } catch (err) {
-      setError(err.message || "Failed to like blog");
+      toast.error(err.message || "Failed to like blog");
       console.error("Like submission error:", err);
     }
   }
@@ -71,7 +71,6 @@ export default function LikeButton({ blogId }) {
       )}
 
       <span className="text-xl">{liked ? "Liked" : "Like"}</span>
-      {error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
     </button>
   );
 }

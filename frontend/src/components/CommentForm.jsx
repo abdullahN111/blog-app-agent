@@ -72,8 +72,6 @@ export default function CommentForm({ blogId }) {
         className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none resize-none"
       ></textarea>
 
-      {error && <div className="mt-2 text-red-600 text-sm">{error}</div>}
-
       <button
         type="submit"
         disabled={loading}
