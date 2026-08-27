@@ -1,20 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ViewTracker({ blogId }) {
   const { data: session, status } = useSession();
-  const tracked = useRef(false);
 
   useEffect(() => {
-    if (status !== "authenticated") return;
-    if (!session?.id_token) return;
-    if (tracked.current) return;
+    
+    if (status === "loading") return;
 
-    tracked.current = true;
+
+    if (!session?.id_token) return;
 
     const trackView = async () => {
       try {
@@ -26,8 +25,13 @@ export default function ViewTracker({ blogId }) {
         });
 
         if (!res.ok) {
-          console.error("Failed to record view:", res.status);
+          console.error("Failed to record view");
+          return;
         }
+
+        const data = await res.json();
+
+        console.log("View tracking:", data);
       } catch (error) {
         console.error("View tracking failed:", error);
       }
