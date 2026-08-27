@@ -47,6 +47,7 @@ export default function PublishedBlogsTable({ blogs }) {
         throw new Error(data.detail || "Failed to unpublish blog");
       }
 
+      toast.success("Blog unpublished successfully.");
       setBlogList((currentBlogs) =>
         currentBlogs.map((blog) =>
           blog.id === blogId ? { ...blog, published: false } : blog,
@@ -81,6 +82,7 @@ export default function PublishedBlogsTable({ blogs }) {
         throw new Error(data.detail || "Failed to publish blog");
       }
 
+      toast.success("Blog published successfully.");
       setBlogList((currentBlogs) =>
         currentBlogs.map((blog) =>
           blog.id === blogId ? { ...blog, published: true } : blog,
