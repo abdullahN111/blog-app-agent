@@ -7,14 +7,14 @@ import Link from "next/link";
 import logo from "../../public/assets/logo.png";
 import { FiMenu, FiChevronDown, FiUser } from "react-icons/fi";
 import { IoIosCreate } from "react-icons/io";
-import { categories } from "../../public/assets/blogRelatedData";
 import { generateSlug } from "../utils/utils";
 import CreateBlogModal from "./CreateBlogModal";
 import { usePathname } from "next/navigation";
+import CategoryBar from "./CategoryBar";
+import SearchBar from "./SearchBar";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileBlogsOpen, setIsMobileBlogsOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
@@ -22,11 +22,6 @@ export default function Header() {
   const { data: session } = useSession();
   const dropdownRef = useRef(null);
   const pathname = usePathname();
-
-  const visibleCategories = categories.slice(0, 6);
-  const moreCategories = categories.slice(6);
-  const visibleMobileCategories = categories.slice(0, 5);
-  const moreMobileCategories = categories.slice(5);
 
   const toggleMore = () => setIsMoreOpen(!isMoreOpen);
 
@@ -38,10 +33,6 @@ export default function Header() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const toggleMobileBlogs = () => {
-    setIsMobileBlogsOpen(!isMobileBlogsOpen);
   };
 
   const toggleAccountDropdown = () => {
@@ -112,6 +103,7 @@ export default function Header() {
         </ul>
 
         <div className="hidden md:flex items-center gap-4">
+          <SearchBar />
           <Link
             href={isAdmin ? "/create-blog" : "#"}
             onClick={(e) => {
@@ -231,111 +223,7 @@ export default function Header() {
         </div>
       </nav>
 
-      {showCategoryBar && (
-        <>
-          {/* Desktop Categories */}
-
-          <div className="hidden md:block border-t border-gray-200">
-            <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8">
-              <div className="flex items-center gap-6 py-3 relative">
-                {visibleCategories.map((category) => {
-                  const slug = generateSlug(category);
-
-                  return (
-                    <Link
-                      key={slug}
-                      href={`/blogs/category/${slug}`}
-                      className="text-sm text-primary hover:text-middle transition-colors whitespace-nowrap"
-                    >
-                      {category}
-                    </Link>
-                  );
-                })}
-
-                {moreCategories.length > 0 && (
-                  <div className="relative">
-                    <button
-                      onClick={toggleMore}
-                      className="flex items-center gap-1 text-sm text-primary hover:text-middle"
-                    >
-                      More
-                      <FiChevronDown
-                        className={`transition-transform ${
-                          isMoreOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    {isMoreOpen && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border z-50 py-2">
-                        {moreCategories.map((category) => {
-                          const slug = generateSlug(category);
-
-                          return (
-                            <Link
-                              key={slug}
-                              href={`/blogs/category/${slug}`}
-                              onClick={() => setIsMoreOpen(false)}
-                              className="block px-4 py-2 hover:bg-middle hover:text-white transition-colors"
-                            >
-                              {category}
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Categories */}
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <div className="px-4 py-3 flex flex-wrap items-center gap-2 relative">
-              {visibleMobileCategories.map((category) => (
-                <Link
-                  key={category}
-                  href={`/blogs/category/${generateSlug(category)}`}
-                  className="px-3 py-1.5 rounded-full border border-gray-300 text-sm text-primary hover:bg-middle hover:text-white hover:border-middle transition-colors"
-                >
-                  {category}
-                </Link>
-              ))}
-
-              <div className="relative">
-                <button
-                  onClick={() => setIsMobileMoreOpen((prev) => !prev)}
-                  className="px-3 py-1.5 rounded-full border border-gray-300 text-sm text-primary flex items-center gap-1 hover:bg-middle hover:text-white hover:border-middle transition-colors"
-                >
-                  More
-                  <FiChevronDown
-                    className={`transition-transform ${
-                      isMobileMoreOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                {isMobileMoreOpen && (
-                  <div className="absolute left-0 top-full mt-2 w-52 bg-white rounded-lg shadow-lg border z-50 py-2">
-                    {" "}
-                    {moreMobileCategories.map((category) => (
-                      <Link
-                        key={category}
-                        href={`/blogs/category/${generateSlug(category)}`}
-                        onClick={() => setIsMobileMoreOpen(false)}
-                        className="block px-4 py-2 hover:bg-middle hover:text-white transition-colors"
-                      >
-                        {category}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      {showCategoryBar && <CategoryBar />}
       <div
         className={`md:hidden fixed inset-0 bg-black opacity-0 z-40 transition-opacity duration-300 ease-in-out ${
           isMenuOpen ? "opacity-30" : "opacity-0 pointer-events-none"

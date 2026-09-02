@@ -1,7 +1,5 @@
 import os
-import shutil
 from typing import List
-import uuid
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.orm import Session
 from utils import models
@@ -11,6 +9,7 @@ from utils.auth import get_current_user
 from utils.utils import generate_slug, extract_cloudinary_public_id
 import cloudinary
 import cloudinary.uploader
+from sqlalchemy import or_
 
 cloudinary.config(
     cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
@@ -85,14 +84,22 @@ async def upload_images(
         "secondary": secondary_url,
     }
     
+
 @router.get("/blogs", response_model=List[models.BlogModel])
-async def get_all_blogs(db: db_dependency):
-    return (
-        db.query(models.Blog)
-        .filter(models.Blog.published.is_(True))
-        .all()
-    )
-    
+async def get_all_blogs(db: db_dependency, search: str = None):
+    query = db.query(models.Blog).filter(models.Blog.published.is_(True))
+
+    if search:
+        like_pattern = f"%{search}%"
+        query = query.filter(
+            or_(
+                models.Blog.title.ilike(like_pattern),
+                models.Blog.content.ilike(like_pattern),
+                models.Blog.introContent.ilike(like_pattern),
+            )
+        )
+
+    return query.all()
     
 @router.get("/blogs/id/{blog_id}", response_model=models.BlogModel)
 async def get_blog_by_id(

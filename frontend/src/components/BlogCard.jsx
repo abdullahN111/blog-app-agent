@@ -3,9 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FiCalendar, FiEye, FiArrowRight, FiHeart } from "react-icons/fi";
+import {generateSlug} from "../utils/utils";
 
 export default function BlogCard({ blog }) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const slug = generateSlug(blog.title);
 
   return (
     <div className="group flex flex-col bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-1">
@@ -21,7 +23,7 @@ export default function BlogCard({ blog }) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 left-4">
-          <Link href={`/blogs/category/${blog.category.toLowerCase()}`}>
+          <Link href={`/blogs/category/${generateSlug(blog.category)}`}>
             <span className="px-3 py-1 bg-middle text-white text-sm font-semibold rounded-full shadow-md cursor-pointer">
               {blog.category}
             </span>
