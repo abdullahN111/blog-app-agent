@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/assets/logo.png";
-import { FiMenu, FiChevronDown, FiUser } from "react-icons/fi";
+import { FiMenu, FiChevronDown, FiUser, FiSearch } from "react-icons/fi";
 import { IoIosCreate } from "react-icons/io";
 import CreateBlogModal from "./CreateBlogModal";
 import { usePathname } from "next/navigation";
