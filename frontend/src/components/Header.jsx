@@ -112,10 +112,13 @@ export default function Header() {
                 setShowCreateModal(true);
               }
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-middle text-white hover:bg-[#f31e65ef] shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5"
+            className="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-middle to-[#f31e65] text-white shadow-sm hover:shadow-lg transition-all duration-200"
           >
-            <IoIosCreate size={20} />
-            <span className="font-medium text-sm">Create Blog</span>
+            <IoIosCreate
+              size={18}
+              className="group-hover:rotate-12 transition-transform duration-200"
+            />
+            <span className="font-semibold text-sm">Create Blog</span>
           </Link>
 
           <div className="relative" ref={dropdownRef}>

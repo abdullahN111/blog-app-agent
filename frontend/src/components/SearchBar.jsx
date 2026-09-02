@@ -25,7 +25,7 @@ export default function SearchBar() {
   return (
     <div className="relative flex items-center">
       {isOpen ? (
-        <form onSubmit={handleSubmit} className="flex items-center">
+        <form onSubmit={handleSubmit} className="flex items-center group">
           <input
             ref={inputRef}
             type="text"
@@ -33,11 +33,11 @@ export default function SearchBar() {
             onChange={(e) => setQuery(e.target.value)}
             onBlur={() => !query && setIsOpen(false)}
             placeholder="Search blogs..."
-            className="w-48 md:w-64 px-4 py-2 rounded-l-lg border border-gray-300 text-sm focus:outline-none focus:border-middle transition-all"
+            className="w-40 md:w-56 px-4 py-2 rounded-l-lg border border-r-0 border-gray-300 text-sm focus:outline-none focus:border-middle transition-colors"
           />
           <button
             type="submit"
-            className="px-3 py-2 rounded-r-lg bg-middle text-white border border-middle hover:bg-[#f31e65ef] transition-colors"
+            className="px-3 py-2 rounded-r-lg bg-middle text-white border border-middle hover:bg-[#f31e65ef] transition-colors cursor-pointer"
           >
             <FiSearch size={16} />
           </button>
@@ -47,7 +47,7 @@ export default function SearchBar() {
               setIsOpen(false);
               setQuery("");
             }}
-            className="ml-2 text-gray-400 hover:text-gray-600"
+            className="ml-2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
           >
             <FiX size={18} />
           </button>
@@ -56,7 +56,7 @@ export default function SearchBar() {
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Search"
-          className="text-primary hover:text-middle transition-colors p-2"
+          className="text-primary hover:text-middle transition-colors p-2 cursor-pointer"
         >
           <FiSearch size={20} />
         </button>
