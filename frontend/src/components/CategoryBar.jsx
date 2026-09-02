@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FiChevronDown } from "react-icons/fi";
-import { categories } from "../../public/assets/blogRelatedData/";
+import { categories } from "../../public/assets/blogRelatedData";
 import { generateSlug } from "../utils/utils";
 
 export default function CategoryBar() {
