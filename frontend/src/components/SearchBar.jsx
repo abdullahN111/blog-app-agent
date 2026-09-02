@@ -8,11 +8,26 @@ export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
+  const containerRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target) &&
+        !query
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [query]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,45 +37,52 @@ export default function SearchBar() {
     setQuery("");
   };
 
+  const handleClear = () => {
+    setQuery("");
+    inputRef.current?.focus();
+  };
+
   return (
-    <div className="relative flex items-center">
-      {isOpen ? (
-        <form onSubmit={handleSubmit} className="flex items-center group">
+    <div ref={containerRef} className="relative flex items-center">
+      <form onSubmit={handleSubmit} className="relative">
+        <div
+          className={`flex items-center bg-gray-50 border rounded-full transition-all duration-300 ease-out ${
+            isOpen
+              ? "w-44 md:w-64 border-gray-200 ring-1 ring-middle/20 bg-white"
+              : "w-10 border-transparent"
+          }`}
+        >
+          <button
+            type={isOpen ? "submit" : "button"}
+            onClick={() => !isOpen && setIsOpen(true)}
+            aria-label="Search"
+            className="flex items-center justify-center w-10 h-10 shrink-0 text-gray-500 hover:text-middle transition-colors cursor-pointer"
+          >
+            <FiSearch size={18} />
+          </button>
+
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onBlur={() => !query && setIsOpen(false)}
             placeholder="Search blogs..."
-            className="w-40 md:w-56 px-4 py-2 rounded-l-lg border border-r-0 border-gray-300 text-sm focus:outline-none focus:border-middle transition-colors"
+            className={`bg-transparent text-sm text-primary placeholder:text-gray-400 focus:outline-none transition-all duration-300 ${
+              isOpen ? "w-full opacity-100 pr-2" : "w-0 opacity-0"
+            }`}
           />
-          <button
-            type="submit"
-            className="px-3 py-2 rounded-r-lg bg-middle text-white border border-middle hover:bg-[#f31e65ef] transition-colors cursor-pointer"
-          >
-            <FiSearch size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setQuery("");
-            }}
-            className="ml-2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-          >
-            <FiX size={18} />
-          </button>
-        </form>
-      ) : (
-        <button
-          onClick={() => setIsOpen(true)}
-          aria-label="Search"
-          className="text-primary hover:text-middle transition-colors p-2 cursor-pointer"
-        >
-          <FiSearch size={20} />
-        </button>
-      )}
+
+          {isOpen && query && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="flex items-center justify-center w-8 h-8 mr-1 shrink-0 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <FiX size={15} />
+            </button>
+          )}
+        </div>
+      </form>
     </div>
   );
 }

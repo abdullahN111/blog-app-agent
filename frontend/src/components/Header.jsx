@@ -7,21 +7,21 @@ import Link from "next/link";
 import logo from "../../public/assets/logo.png";
 import { FiMenu, FiChevronDown, FiUser } from "react-icons/fi";
 import { IoIosCreate } from "react-icons/io";
-import { generateSlug } from "../utils/utils";
 import CreateBlogModal from "./CreateBlogModal";
 import { usePathname } from "next/navigation";
 import CategoryBar from "./CategoryBar";
 import SearchBar from "./SearchBar";
+import MobileSearchBar from "./MobileSearchBar";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [isMobileMoreOpen, setIsMobileMoreOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: session } = useSession();
   const dropdownRef = useRef(null);
   const pathname = usePathname();
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const toggleMore = () => setIsMoreOpen(!isMoreOpen);
 
@@ -215,17 +215,32 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="md:hidden flex items-center gap-4">
+        <div className="md:hidden flex items-center gap-1">
           <button
-            className="flex flex-col justify-center items-center w-10 h-10 py-[6px] rounded cursor-pointer"
+            onClick={() => setIsMobileSearchOpen((v) => !v)}
+            aria-label="Search"
+            className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors cursor-pointer ${
+              isMobileSearchOpen
+                ? "bg-middle/10 text-middle"
+                : "text-primary hover:bg-gray-100"
+            }`}
+          >
+            <FiSearch size={20} />
+          </button>
+
+          <button
+            className="flex items-center justify-center w-10 h-10 rounded-full text-primary hover:bg-gray-100 transition-colors cursor-pointer"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            <FiMenu className="text-4xl" />
+            <FiMenu size={24} />
           </button>
         </div>
       </nav>
-
+      <MobileSearchBar
+        isOpen={isMobileSearchOpen}
+        onClose={() => setIsMobileSearchOpen(false)}
+      />
       {showCategoryBar && <CategoryBar />}
       <div
         className={`md:hidden fixed inset-0 bg-black opacity-0 z-40 transition-opacity duration-300 ease-in-out ${
@@ -262,7 +277,8 @@ export default function Header() {
               </svg>
             </button>
           </div>
-          <div className="flex items-center mb-4 border-b pb-4 border-gray-500">
+          <div className="flex items-center mb-2 border-b pb-4 border-gray-100">
+            {" "}
             <Link href="/" className="flex items-center">
               <Image src={logo} alt="Blogout Logo" width={70} height={70} />
               <span className="font-semibold text-xl sm:text-[22px] text-primary">
@@ -271,38 +287,33 @@ export default function Header() {
             </Link>
           </div>
 
-          <ul className="flex flex-col mb-4">
-            <li>
-              <Link
-                href="/"
-                className="text-primary hover:text-middle transition-colors text-[17px] block py-[6px]"
-                onClick={toggleMenu}
-              >
-                Home
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/blogs"
-                className="text-primary hover:text-middle transition-colors text-[17px] block py-[6px]"
-                onClick={toggleMenu}
-              >
-                Blogs
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/about"
-                className="text-primary hover:text-middle transition-colors text-[17px] block py-[6px]"
-                onClick={toggleMenu}
-              >
-                About
-              </Link>
-            </li>
+          <ul className="flex flex-col gap-1 mb-6">
+            {[
+              { href: "/", label: "Home", icon: FiHome },
+              { href: "/blogs", label: "Blogs", icon: FiBookOpen },
+              { href: "/about", label: "About", icon: FiInfo },
+            ].map(({ href, label, icon: Icon }) => {
+              const active = pathname === href;
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    onClick={toggleMenu}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition-colors ${
+                      active
+                        ? "bg-middle/10 text-middle"
+                        : "text-primary hover:bg-gray-50"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
 
-          <div className="py-4 border-t border-gray-500">
+          <div className="py-4 border-t border-gray-100">
             <Link
               href={isAdmin ? "/create-blog" : "#"}
               onClick={(e) => {
@@ -338,40 +349,40 @@ export default function Header() {
             </Link>
 
             {session ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 mb-3">
+              <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                <div className="flex items-center gap-3">
                   {session.user?.image && (
                     <Image
                       src={session.user.image}
                       alt="User profile"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
+                      width={44}
+                      height={44}
+                      className="rounded-full ring-2 ring-white"
                     />
                   )}
-                  <div>
-                    <p className="font-semibold text-sm">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-primary truncate">
                       {session.user?.name}
                     </p>
-                    <p className="text-gray-600 text-xs">
+                    <p className="text-gray-500 text-xs truncate">
                       {session.user?.email}
                     </p>
                   </div>
                 </div>
-                {isAdmin ? (
+
+                {isAdmin && (
                   <Link
                     href="/account"
-                    className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
+                    className="block text-middle hover:text-middle-dark text-sm font-medium py-1 transition-colors duration-200"
                     onClick={toggleMenu}
                   >
                     Manage Account
                   </Link>
-                ) : (
-                  <></>
                 )}
+
                 <button
                   onClick={() => signOut()}
-                  className="text-red-600 hover:text-red-800 text-sm py-1 transition-colors duration-200"
+                  className="w-full text-left text-red-600 hover:text-red-700 text-sm font-medium py-1 transition-colors duration-200 cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -379,7 +390,7 @@ export default function Header() {
             ) : (
               <button
                 onClick={() => signIn("google")}
-                className="w-full bg-middle text-white py-2 px-4 rounded-md hover:bg-middle-dark transition-colors duration-200 text-sm cursor-pointer"
+                className="w-full bg-gradient-to-r from-middle to-[#f31e65] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 text-sm cursor-pointer shadow-sm hover:shadow-md"
               >
                 Sign in with Google
               </button>
