@@ -5,7 +5,15 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "../../public/assets/logo.png";
-import { FiMenu, FiChevronDown, FiUser, FiSearch, FiHome, FiBookOpen, FiInfo } from "react-icons/fi";
+import {
+  FiMenu,
+  FiChevronDown,
+  FiUser,
+  FiSearch,
+  FiHome,
+  FiBookOpen,
+  FiInfo,
+} from "react-icons/fi";
 import { IoIosCreate } from "react-icons/io";
 import CreateBlogModal from "./CreateBlogModal";
 import { usePathname } from "next/navigation";
@@ -255,14 +263,21 @@ export default function Header() {
         }`}
       >
         <div className="p-4 h-full flex flex-col">
-          <div className="flex justify-end mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/" className="flex items-center" onClick={toggleMenu}>
+              <Image src={logo} alt="Blogout Logo" width={48} height={48} />
+              <span className="font-semibold text-lg text-primary">
+                Blogout
+              </span>
+            </Link>
+
             <button
               onClick={toggleMenu}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-secondary/30 transition-colors duration-200"
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors duration-200"
               aria-label="Close menu"
             >
               <svg
-                className="w-6 h-6 text-primary"
+                className="w-5 h-5 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -277,15 +292,44 @@ export default function Header() {
               </svg>
             </button>
           </div>
-          <div className="flex items-center mb-2 border-b pb-4 border-gray-100">
-            {" "}
-            <Link href="/" className="flex items-center">
-              <Image src={logo} alt="Blogout Logo" width={70} height={70} />
-              <span className="font-semibold text-xl sm:text-[22px] text-primary">
-                Blogout
-              </span>
-            </Link>
-          </div>
+
+          {session ? (
+            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-6">
+              {session.user?.image && (
+                <Image
+                  src={session.user.image}
+                  alt="User profile"
+                  width={48}
+                  height={48}
+                  className="rounded-full ring-2 ring-white"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm text-primary truncate">
+                  {session.user?.name}
+                </p>
+                <p className="text-gray-500 text-xs truncate">
+                  {session.user?.email}
+                </p>
+              </div>
+              {isAdmin && (
+                <Link
+                  href="/account"
+                  onClick={toggleMenu}
+                  className="shrink-0 text-xs font-semibold text-middle hover:text-middle-dark transition-colors"
+                >
+                  Manage
+                </Link>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              className="w-full bg-gradient-to-r from-middle to-[#f31e65] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 text-sm cursor-pointer shadow-sm hover:shadow-md mb-6"
+            >
+              Sign in with Google
+            </button>
+          )}
 
           <ul className="flex flex-col gap-1 mb-6">
             {[
@@ -313,30 +357,26 @@ export default function Header() {
             })}
           </ul>
 
-          <div className="py-4 border-t border-gray-100">
+          <div className="pt-4 border-t border-gray-100">
             <Link
               href={isAdmin ? "/create-blog" : "#"}
               onClick={(e) => {
                 if (!isAdmin) {
                   e.preventDefault();
                   toggleMenu();
-
                   setTimeout(() => {
                     setShowCreateModal(true);
                   }, 250);
-
                   return;
                 }
-
                 toggleMenu();
               }}
-              className="flex items-center justify-between px-4 py-3 mb-6 rounded-xl bg-middle/10 border border-middle/20 hover:bg-middle hover:text-white transition-all group"
+              className="flex items-center justify-between px-4 py-3 rounded-xl bg-middle/10 border border-middle/20 hover:bg-middle hover:text-white transition-all group"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-middle text-white flex items-center justify-center group-hover:bg-white group-hover:text-middle transition-colors">
                   <IoIosCreate size={20} />
                 </div>
-
                 <div>
                   <p className="font-semibold">Create Blog</p>
                   <p className="text-xs text-gray-500 group-hover:text-white/80">
@@ -344,58 +384,18 @@ export default function Header() {
                   </p>
                 </div>
               </div>
-
               <FiChevronDown className="-rotate-90" />
             </Link>
-
-            {session ? (
-              <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-                <div className="flex items-center gap-3">
-                  {session.user?.image && (
-                    <Image
-                      src={session.user.image}
-                      alt="User profile"
-                      width={44}
-                      height={44}
-                      className="rounded-full ring-2 ring-white"
-                    />
-                  )}
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-primary truncate">
-                      {session.user?.name}
-                    </p>
-                    <p className="text-gray-500 text-xs truncate">
-                      {session.user?.email}
-                    </p>
-                  </div>
-                </div>
-
-                {isAdmin && (
-                  <Link
-                    href="/account"
-                    className="block text-middle hover:text-middle-dark text-sm font-medium py-1 transition-colors duration-200"
-                    onClick={toggleMenu}
-                  >
-                    Manage Account
-                  </Link>
-                )}
-
-                <button
-                  onClick={() => signOut()}
-                  className="w-full text-left text-red-600 hover:text-red-700 text-sm font-medium py-1 transition-colors duration-200 cursor-pointer"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => signIn("google")}
-                className="w-full bg-gradient-to-r from-middle to-[#f31e65] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 text-sm cursor-pointer shadow-sm hover:shadow-md"
-              >
-                Sign in with Google
-              </button>
-            )}
           </div>
+
+          {session && (
+            <button
+              onClick={() => signOut()}
+              className="mt-auto text-left text-red-600 hover:text-red-700 text-sm font-medium py-3 transition-colors duration-200 cursor-pointer"
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       </div>
       <CreateBlogModal
