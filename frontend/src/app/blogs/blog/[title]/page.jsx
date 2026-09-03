@@ -48,8 +48,8 @@ export default async function BlogPage({ params }) {
   return (
     <article className="min-h-screen bg-gray-50 py-8">
       <ViewTracker blogId={blog.id} />
-      <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-6">
+        <div className="max-w-5xl mx-auto">
           <Link
             href="/blogs"
             className="inline-flex items-center text-middle hover:text-primary mb-4 transition-colors"
@@ -77,7 +77,7 @@ export default async function BlogPage({ params }) {
               </div>
             </div>
 
-            <h1 className="text-4xl font-bold text-primary mb-4">
+            <h1 className="text-[32px] sm:text-4xl font-bold text-primary mb-4">
               {blog.title}
             </h1>
 
@@ -105,15 +105,15 @@ export default async function BlogPage({ params }) {
             </div>
           </header>
 
-          <div className="prose max-w-none bg-white rounded-xl p-6 md:p-8 shadow-md">
+          <div className="prose max-w-none bg-white rounded-xl p-6 shadow-md">
             <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-              <h2 className="text-3xl font-semibold text-primary mb-2">
+              <h2 className="text-[26px] sm:text-3xl font-semibold text-primary mb-2">
                 {blog.introContentHeading}
               </h2>
-              <p className="text-lg">{firstPart}</p>
+              <p className="text-[17px] sm:text-lg">{firstPart}</p>
 
               {blog.secondary_image && (
-                <div className="my-8 rounded-xl overflow-hidden">
+                <div className="my-6 sm:my-8 rounded-xl overflow-hidden">
                   <Image
                     src={
                       blog.secondary_image.startsWith("http")
@@ -121,17 +121,17 @@ export default async function BlogPage({ params }) {
                         : `${API_URL}/${blog.secondary_image.replace(/\\/g, "/")}`
                     }
                     alt={`${blog.title} - Additional content`}
-                    width={800}
-                    height={400}
+                    width={850}
+                    height={500}
                     className="w-full h-auto object-cover rounded-xl"
                   />
                 </div>
               )}
 
-              <h3 className="text-[28px] font-semibold text-primary my-6">
+              <h3 className="text-[26px] sm:text-3xl font-semibold text-primary my-6">
                 {blog.contentHeading}
               </h3>
-              <p className="text-lg">{secondPart}</p>
+              <p className="text-[17px] sm:text-lg">{secondPart}</p>
               <LikeButton blogId={blog.id} />
             </div>
           </div>
