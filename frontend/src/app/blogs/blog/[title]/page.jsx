@@ -49,7 +49,7 @@ export default async function BlogPage({ params }) {
     <article className="min-h-screen bg-gray-50 py-8">
       <ViewTracker blogId={blog.id} />
       <div className="max-w-[1440px] mx-auto px-4 md:px-6">
-        <div className="max-w-[930px] mx-auto">
+        <div className="max-w-[920px] mx-auto">
           <Link
             href="/blogs"
             className="inline-flex items-center text-middle hover:text-primary mb-4 transition-colors"
@@ -105,7 +105,7 @@ export default async function BlogPage({ params }) {
             </div>
           </header>
 
-          <div className="prose max-w-none bg-white rounded-xl p-6 shadow-md">
+          <div className="prose max-w-none bg-white rounded-xl p-4 sm:p-6 shadow-md">
             <div className="text-gray-700 leading-relaxed whitespace-pre-line">
               <h2 className="text-[26px] sm:text-3xl font-semibold text-primary mb-2">
                 {blog.introContentHeading}
