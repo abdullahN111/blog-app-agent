@@ -121,14 +121,14 @@ export default async function BlogPage({ params }) {
                         : `${API_URL}/${blog.secondary_image.replace(/\\/g, "/")}`
                     }
                     alt={`${blog.title} - Additional content`}
-                    width={850}
-                    height={500}
+                    width={825}
+                    height={450}
                     className="w-full h-auto object-cover rounded-xl"
                   />
                 </div>
               )}
 
-              <h3 className="text-[26px] sm:text-3xl font-semibold text-primary my-6">
+              <h3 className="text-[26px] sm:text-3xl font-semibold text-primary mb-2">
                 {blog.contentHeading}
               </h3>
               <p className="text-[17px] sm:text-lg">{secondPart}</p>
