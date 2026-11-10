@@ -419,7 +419,7 @@ headline_alternatives:
 - Provide 3 distinct alternative headlines (1. Analytical, 2. Contrarian/Provocative, 3. Narrative) for A/B selection.
 
 suggested_category:
-- Best matching section from: Tech, Sports, Fashion, Travel, Politics, Education, Science, Crime, History, Adventure, Fiction, Cinema/TV.
+- Best matching section from: Tech, Society, Governance, Infrastructure, Economy, Politics, Education, Health, World Affairs, Business, Science, Environment, Opinion, Culture, History, Sports, Travel, Fashion, Crime, Adventure, Fiction, Cinema/TV.
 
 seo_tags:
 - 4 to 5 concise topic tags for search and indexing.

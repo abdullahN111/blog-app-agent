@@ -275,12 +275,11 @@ export default function CreateBlog() {
                     type="select"
                     id="category"
                     name="category"
-                    label="Section Desk"
-                    required
+                    label="Section Desk (Optional — AI Auto-Selects if Blank)"
                     value={formData.category}
                     onChange={handleChange}
                     options={[
-                      { value: "", label: "Select a publication section" },
+                      { value: "", label: "Auto-detect best category via AI" },
                       ...categories.map((c) => ({ value: c, label: c })),
                     ]}
                   />

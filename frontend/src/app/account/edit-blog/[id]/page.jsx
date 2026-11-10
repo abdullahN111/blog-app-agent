@@ -137,10 +137,11 @@ export default function EditBlogPage() {
         headers["X-Gemini-Key"] = savedKey;
       }
 
-      const res = await fetch(`${API_URL}/agent/assist`, {
+      const res = await fetch(`/api/agent`, {
         method: "POST",
         headers,
         body: JSON.stringify({
+          _endpoint: "assist",
           action,
           text: sourceText,
           context_title: formData.title,

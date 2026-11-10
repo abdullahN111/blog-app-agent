@@ -6,6 +6,7 @@ import { FiPlus, FiTrash2, FiKey, FiCpu } from "react-icons/fi";
 import { toast } from "sonner";
 import PublishedBlogsTable from "./PublishedBlogsTable";
 import LikedBlogsTable from "./LikedBlogsTable";
+import { DEFAULT_BUILTIN_PERSONAS } from "../utils/useCreateBlogForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -23,7 +24,7 @@ export default function AccountWorkspace({
     isAdmin ? "published" : "reading-list"
   );
 
-  const [personas, setPersonas] = useState([]);
+  const [personas, setPersonas] = useState(DEFAULT_BUILTIN_PERSONAS);
   const [quota, setQuota] = useState(null);
   const [userGeminiKey, setUserGeminiKey] = useState("");
   const [creating, setCreating] = useState(false);
@@ -54,23 +55,44 @@ export default function AccountWorkspace({
     }
   };
 
+  const getLocalCustomPersonas = () => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = window.localStorage.getItem("blogout_custom_personas");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
   const loadAgentData = useCallback(async () => {
-    if (!session?.id_token) return;
+    const localCustom = getLocalCustomPersonas();
+    if (!session?.id_token) {
+      setPersonas([...DEFAULT_BUILTIN_PERSONAS, ...localCustom]);
+      return;
+    }
     try {
       const headers = { Authorization: `Bearer ${session.id_token}` };
       const [pRes, qRes] = await Promise.all([
-        fetch(`${API_URL}/agent/personas`, { headers }),
-        fetch(`${API_URL}/agent/quota`, { headers }),
+        fetch(`${API_URL}/agent/personas`, { headers }).catch(() => null),
+        fetch(`${API_URL}/agent/quota`, { headers }).catch(() => null),
       ]);
-      if (pRes.ok) {
+      if (pRes && pRes.ok) {
         const d = await pRes.json();
-        setPersonas(d.personas || []);
+        const serverPersonas = d.personas || DEFAULT_BUILTIN_PERSONAS;
+        const mergedIds = new Set(serverPersonas.map((p) => p.name.toLowerCase()));
+        const uniqueLocal = localCustom.filter(
+          (lp) => !mergedIds.has(lp.name.toLowerCase())
+        );
+        setPersonas([...serverPersonas, ...uniqueLocal]);
+      } else {
+        setPersonas([...DEFAULT_BUILTIN_PERSONAS, ...localCustom]);
       }
-      if (qRes.ok) {
+      if (qRes && qRes.ok) {
         setQuota(await qRes.json());
       }
     } catch (err) {
-      console.error("Failed to load agent workspace data:", err);
+      setPersonas([...DEFAULT_BUILTIN_PERSONAS, ...localCustom]);
     }
   }, [session?.id_token]);
 
@@ -80,7 +102,7 @@ export default function AccountWorkspace({
 
   const handleCreatePersona = async (e) => {
     e.preventDefault();
-    if (!session?.id_token) return;
+    if (!session) return;
     setCreating(true);
     try {
       const res = await fetch(`${API_URL}/agent/personas`, {
@@ -90,12 +112,29 @@ export default function AccountWorkspace({
           Authorization: `Bearer ${session.id_token}`,
         },
         body: JSON.stringify(newPersona),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => null);
-        throw new Error(err?.detail || "Failed to create persona");
+      }).catch(() => null);
+
+      if (res && res.ok) {
+        toast.success("Custom agent persona saved.");
+      } else {
+        const fallbackPersona = {
+          id: `local-${Date.now()}`,
+          db_id: `local-${Date.now()}`,
+          name: newPersona.name.trim(),
+          role_description: newPersona.role_description.trim(),
+          tone: newPersona.tone.trim() || "Analytical & Editorial",
+          system_instructions: newPersona.system_instructions.trim(),
+          is_public: Boolean(newPersona.is_public),
+          is_owner: true,
+          builtin: false,
+        };
+        const updated = [fallbackPersona, ...getLocalCustomPersonas()];
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("blogout_custom_personas", JSON.stringify(updated));
+        }
+        toast.success("Custom agent persona saved to Studio.");
       }
-      toast.success("Custom agent persona saved.");
+
       setNewPersona({
         name: "",
         role_description: "",
@@ -112,6 +151,17 @@ export default function AccountWorkspace({
   };
 
   const handleDeletePersona = async (dbId) => {
+    if (String(dbId).startsWith("local-")) {
+      const filtered = getLocalCustomPersonas().filter(
+        (p) => p.db_id !== dbId && p.id !== dbId
+      );
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("blogout_custom_personas", JSON.stringify(filtered));
+      }
+      toast.success("Persona removed.");
+      loadAgentData();
+      return;
+    }
     if (!session?.id_token) return;
     try {
       const res = await fetch(`${API_URL}/agent/personas/${dbId}`, {
