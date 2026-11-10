@@ -90,7 +90,6 @@ export default function PublishedBlogsTable({ blogs }) {
       );
     } catch (error) {
       console.error("Publish error:", error);
-      // alert(error.message);
     } finally {
       setLoadingId(null);
     }
@@ -134,53 +133,52 @@ export default function PublishedBlogsTable({ blogs }) {
 
   if (!blogList.length) {
     return (
-      <div className="rounded-2xl border bg-white p-12 text-center shadow-sm">
-        <h3 className="text-xl font-semibold text-primary">
-          No published blogs
+      <div className="border border-[#E4DFD7] bg-[#FFFFFF] p-12 text-center">
+        <h3 className="font-editorial text-2xl font-bold text-[#111110]">
+          No commissioned dispatches
         </h3>
-
-        <p className="mt-2 text-gray-500">
-          Your published blogs will appear here.
+        <p className="mt-2 text-xs font-mono-meta uppercase tracking-wider text-[#85817A]">
+          Your published manuscripts will appear here.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+    <div className="border border-[#111110] bg-[#FFFFFF]">
       <div className="overflow-x-auto">
-        <table className="min-w-[1100px] w-full table-fixed">
-          <thead className="bg-slate-900">
+        <table className="min-w-[1040px] w-full table-fixed">
+          <thead className="bg-[#F3EFEA] border-b border-[#111110]">
             <tr>
-              <th className="w-[360px] px-7 py-5 text-left text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Blog
+              <th className="w-[380px] px-6 py-4 text-left text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Manuscript &amp; Desk
               </th>
 
-              <th className="px-7 py-5 text-left text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Description
+              <th className="px-6 py-4 text-left text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Lead Excerpt
               </th>
 
-              <th className="w-[170px] px-7 py-5 text-center text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Stats
+              <th className="w-[160px] px-6 py-4 text-center text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Metrics
               </th>
 
-              <th className="w-[220px] px-7 py-5 text-center text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Actions
+              <th className="w-[210px] px-6 py-4 text-center text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Controls
               </th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-[#E4DFD7]">
             {blogList.map((blog) => {
-              const slug = generateSlug(blog.title);
+              const slug = blog.slug || generateSlug(blog.title);
 
               return (
                 <tr
                   key={blog.id}
-                  className="border-b border-slate-100 transition-colors hover:bg-slate-50"
+                  className="transition-colors hover:bg-[#FAF8F5]"
                 >
-                  <td className="px-7 py-6">
-                    <div className="flex items-center gap-5">
+                  <td className="px-6 py-5">
+                    <div className="flex items-start gap-4">
                       <Image
                         src={
                           blog.primary_image.startsWith("http")
@@ -188,61 +186,72 @@ export default function PublishedBlogsTable({ blogs }) {
                             : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
                         }
                         alt={blog.title}
-                        width={120}
-                        height={78}
-                        className="h-[78px] w-[120px] rounded-lg border border-slate-200 object-cover shadow-sm"
+                        width={108}
+                        height={72}
+                        className="h-[72px] w-[108px] border border-[#E4DFD7] object-cover shrink-0"
                       />
 
                       <div className="min-w-0 flex-1">
-                        <h4 className="line-clamp-2 text-lg font-semibold leading-6 text-slate-900">
+                        <h4 className="line-clamp-2 font-editorial text-lg font-bold leading-snug text-[#111110]">
                           {blog.title}
                         </h4>
 
-                        <span className="mt-3 inline-flex rounded-md border border-middle-200 bg-middle/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-middle">
-                          {blog.category}
-                        </span>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <span className="inline-flex border border-[#E4DFD7] bg-[#F3EFEA] px-2 py-0.5 text-[10px] font-mono-meta uppercase tracking-wider text-[#C83E2B]">
+                            {blog.category}
+                          </span>
+                          <span
+                            className={`inline-flex px-2 py-0.5 text-[10px] font-mono-meta uppercase tracking-wider ${
+                              blog.published
+                                ? "bg-[#2A6F4E]/10 text-[#2A6F4E]"
+                                : "bg-[#85817A]/15 text-[#57544E]"
+                            }`}
+                          >
+                            {blog.published ? "Published" : "Draft / Archived"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-7 py-6 align-top">
-                    <p className="line-clamp-3 break-words text-[15px] leading-7 text-slate-600">
+                  <td className="px-6 py-5 align-top">
+                    <p className="line-clamp-3 break-words text-sm leading-relaxed text-[#57544E]">
                       {blog.introContent}
                     </p>
                   </td>
 
-                  <td className="px-7 py-6">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="flex items-center gap-2 text-base text-slate-700">
-                        <FiHeart className="text-red-500 size-4" />
-                        <span className="font-semibold">{blog.likes}</span>
+                  <td className="px-6 py-5">
+                    <div className="flex flex-col items-center gap-2 font-mono-meta text-xs text-[#111110]">
+                      <div className="flex items-center gap-1.5">
+                        <FiHeart className="text-[#C83E2B] size-3.5" />
+                        <span>{blog.likes}</span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-base text-slate-700">
-                        <FiEye className="text-slate-500 size-4" />
-                        <span className="font-semibold">{blog.views}</span>
+                      <div className="flex items-center gap-1.5 text-[#57544E]">
+                        <FiEye className="size-3.5" />
+                        <span>{blog.views}</span>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-7 py-6">
-                    <div className="flex flex-wrap justify-center gap-2">
+                  <td className="px-6 py-5">
+                    <div className="flex flex-wrap justify-center gap-1.5">
                       <Link
                         href={`/blogs/blog/${slug}`}
-                        title="View"
-                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-slate-900 hover:text-white"
+                        title="View Essay"
+                        className="border border-[#E4DFD7] bg-[#FAF8F5] p-2.5 text-[#111110] transition hover:border-[#111110] hover:bg-[#111110] hover:text-[#FAF8F5]"
                       >
-                        <FiEye size={16} />
+                        <FiEye size={15} />
                       </Link>
 
                       <button
-                        title="Edit"
+                        title="Edit Manuscript"
                         onClick={() =>
                           router.push(`/account/edit-blog/${blog.id}`)
                         }
-                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-blue-600 hover:text-white"
+                        className="border border-[#E4DFD7] bg-[#FAF8F5] p-2.5 text-[#111110] transition hover:border-[#111110] hover:bg-[#111110] hover:text-[#FAF8F5] cursor-pointer"
                       >
-                        <FiEdit2 size={16} />
+                        <FiEdit2 size={15} />
                       </button>
 
                       {blog.published ? (
@@ -250,18 +259,18 @@ export default function PublishedBlogsTable({ blogs }) {
                           title="Unpublish"
                           onClick={() => handleUnpublish(blog.id)}
                           disabled={loadingId === blog.id}
-                          className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-amber-500 hover:text-white disabled:opacity-50"
+                          className="border border-[#E4DFD7] bg-[#FAF8F5] p-2.5 text-[#111110] transition hover:border-[#111110] hover:bg-[#111110] hover:text-[#FAF8F5] disabled:opacity-50 cursor-pointer"
                         >
-                          <FiArchive size={16} />
+                          <FiArchive size={15} />
                         </button>
                       ) : (
                         <button
                           title="Publish"
                           onClick={() => handlePublish(blog.id)}
                           disabled={loadingId === blog.id}
-                          className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-green-600 hover:text-white disabled:opacity-50"
+                          className="border border-[#E4DFD7] bg-[#FAF8F5] p-2.5 text-[#2A6F4E] transition hover:border-[#2A6F4E] hover:bg-[#2A6F4E] hover:text-[#FAF8F5] disabled:opacity-50 cursor-pointer"
                         >
-                          <FiCheck size={16} />
+                          <FiCheck size={15} />
                         </button>
                       )}
 
@@ -269,9 +278,9 @@ export default function PublishedBlogsTable({ blogs }) {
                         title="Delete"
                         onClick={() => setDeleteBlogId(blog.id)}
                         disabled={loadingId === blog.id}
-                        className="rounded-lg border border-slate-200 bg-white p-2 text-slate-700 transition hover:bg-red-600 hover:text-white disabled:opacity-50"
+                        className="border border-[#E4DFD7] bg-[#FAF8F5] p-2.5 text-[#C83E2B] transition hover:border-[#C83E2B] hover:bg-[#C83E2B] hover:text-[#FAF8F5] disabled:opacity-50 cursor-pointer"
                       >
-                        <FiTrash2 size={16} />
+                        <FiTrash2 size={15} />
                       </button>
                     </div>
                   </td>
@@ -281,16 +290,19 @@ export default function PublishedBlogsTable({ blogs }) {
           </tbody>
         </table>
       </div>
+
       {deleteBlogId !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-xl font-semibold text-slate-900">
-              Delete this blog?
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#111110]/60 px-4">
+          <div className="w-full max-w-md border border-[#111110] bg-[#FAF8F5] p-7 shadow-[8px_8px_0px_#111110]">
+            <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+              Permanent Deletion
+            </span>
+            <h3 className="font-editorial text-2xl font-bold text-[#111110] mt-1">
+              Delete this manuscript?
             </h3>
 
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              This action cannot be undone. The blog and its associated images
-              will be permanently deleted.
+            <p className="mt-2 text-sm leading-relaxed text-[#57544E]">
+              This action is irreversible. The essay and its hosted photographic plates will be permanently purged.
             </p>
 
             <div className="mt-6 flex justify-end gap-3">
@@ -298,7 +310,7 @@ export default function PublishedBlogsTable({ blogs }) {
                 type="button"
                 onClick={() => setDeleteBlogId(null)}
                 disabled={loadingId === deleteBlogId}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                className="border border-[#111110] bg-transparent px-4 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#F3EFEA] disabled:opacity-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -307,9 +319,9 @@ export default function PublishedBlogsTable({ blogs }) {
                 type="button"
                 onClick={() => handleDelete(deleteBlogId)}
                 disabled={loadingId === deleteBlogId}
-                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="bg-[#C83E2B] px-4 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#FAF8F5] hover:bg-[#A63020] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
               >
-                {loadingId === deleteBlogId ? "Deleting..." : "Delete Blog"}
+                {loadingId === deleteBlogId ? "Purging..." : "Confirm Delete"}
               </button>
             </div>
           </div>

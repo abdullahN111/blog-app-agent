@@ -27,23 +27,23 @@ export default function MobileSearchBar({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3">
+    <div className="md:hidden border-t border-[#E4DFD7] bg-[#FAF8F5] px-4 py-3">
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <div className="flex items-center flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2.5">
-          <FiSearch className="text-gray-400 shrink-0" size={16} />
+        <div className="flex items-center flex-1 bg-[#FFFFFF] border border-[#111110] px-3 py-2">
+          <FiSearch className="text-[#85817A] shrink-0" size={16} />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search blogs..."
-            className="w-full bg-transparent px-2.5 text-sm text-primary placeholder:text-gray-400 focus:outline-none"
+            placeholder="Search archive..."
+            className="w-full bg-transparent px-2.5 text-xs font-mono-meta text-[#111110] placeholder:text-[#85817A] focus:outline-none"
           />
           {query && (
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="text-gray-400 hover:text-gray-600 shrink-0"
+              className="text-[#85817A] hover:text-[#111110] shrink-0"
             >
               <FiX size={16} />
             </button>
@@ -51,9 +51,9 @@ export default function MobileSearchBar({ isOpen, onClose }) {
         </div>
         <button
           type="submit"
-          className="shrink-0 px-4 py-2.5 rounded-full bg-middle text-white text-sm font-medium hover:bg-[#f31e65ef] transition-colors"
+          className="shrink-0 px-4 py-2 bg-[#111110] text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-wider hover:bg-[#C83E2B] transition-colors"
         >
-          Go
+          Search
         </button>
       </form>
     </div>

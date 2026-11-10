@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { FiCalendar, FiEye, FiArrowLeft, FiHeart } from "react-icons/fi";
+import { FiArrowLeft, FiHeart, FiEye } from "react-icons/fi";
 import BlogGrid from "../../../../components/BlogGrid";
 import CommentForm from "../../../../components/CommentForm";
 import CommentList from "../../../../components/CommentList";
@@ -22,7 +22,7 @@ async function getRelatedBlogs(category, excludeId) {
   });
   if (!res.ok) return [];
   const blogs = await res.json();
-  return blogs.filter((b) => b.id !== excludeId).slice(0, 2);
+  return blogs.filter((b) => b.id !== excludeId).slice(0, 3);
 }
 
 async function getComments(blogId) {
@@ -46,113 +46,148 @@ export default async function BlogPage({ params }) {
   const secondPart = blog.content;
 
   return (
-    <article className="min-h-screen bg-gray-50 py-8">
+    <article className="min-h-screen bg-[#FAF8F5] py-10 md:py-16">
       <ViewTracker blogId={blog.id} />
-      <div className="max-w-[1440px] mx-auto px-4 md:px-6">
-        <div className="max-w-[920px] mx-auto">
-          <Link
-            href="/blogs"
-            className="inline-flex items-center text-middle hover:text-primary mb-4 transition-colors"
-          >
-            <FiArrowLeft className="mr-2" />
-            Back to Blogs
-          </Link>
 
-          <header className="mb-8">
-            <div className="relative h-80 w-full rounded-xl overflow-hidden mb-4">
-              <Image
-                src={
-                  blog.primary_image.startsWith("http")
-                    ? blog.primary_image
-                    : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
-                }
-                alt={blog.title}
-                fill
-                className="object-cover"
-              />
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1 bg-middle text-white text-sm font-semibold rounded-full shadow-md">
-                  {blog.category}
+      <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8">
+        <div className="max-w-[820px] mx-auto">
+          <div className="flex items-center justify-between pb-6 mb-8 border-b border-[#111110]">
+            <Link
+              href="/blogs"
+              className="inline-flex items-center gap-2 text-xs font-mono-meta uppercase tracking-[0.14em] text-[#57544E] hover:text-[#111110] transition-colors"
+            >
+              <FiArrowLeft size={14} />
+              <span>Back to Archive</span>
+            </Link>
+
+            <Link
+              href={`/blogs/category/${blog.category}`}
+              className="px-2.5 py-1 bg-[#F3EFEA] border border-[#111110] text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#C83E2B] font-medium"
+            >
+              {blog.category}
+            </Link>
+          </div>
+
+          <header className="mb-10">
+            <h1 className="font-editorial text-3xl sm:text-5xl md:text-[54px] font-bold text-[#111110] leading-[1.1] tracking-tight mb-6">
+              {blog.title}
+            </h1>
+
+            <div className="flex flex-wrap items-center justify-between gap-4 py-4 border-y border-[#E4DFD7] text-xs font-mono-meta uppercase tracking-wider text-[#57544E]">
+              <time dateTime={blog.created_at}>
+                Published{" "}
+                {new Date(blog.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+
+              <div className="flex items-center gap-6">
+                <span className="inline-flex items-center gap-1.5">
+                  <FiHeart className="text-[#C83E2B]" size={14} />
+                  {blog.likes} Endorsements
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <FiEye className="text-[#57544E]" size={14} />
+                  {blog.views} Reads
                 </span>
               </div>
             </div>
 
-            <h1 className="text-[32px] sm:text-4xl font-bold text-primary mb-4">
-              {blog.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center justify-between gap-4 text-gray-600">
-              <div className="flex items-center">
-                <FiCalendar className="mr-2" />
-                <time dateTime={blog.created_at}>
-                  {new Date(blog.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </time>
+            <figure className="mt-8 border border-[#111110] bg-[#FFFFFF] p-2">
+              <div className="relative h-72 sm:h-[440px] w-full overflow-hidden bg-[#F3EFEA]">
+                <Image
+                  src={
+                    blog.primary_image.startsWith("http")
+                      ? blog.primary_image
+                      : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
+                  }
+                  alt={blog.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
-              <div className="flex items-center gap-6">
-                <div className="flex items-center">
-                  <FiHeart className="mr-2 text-red-500" />
-                  <span>{blog.likes} Likes</span>
-                </div>
-                <div className="flex items-center">
-                  <FiEye className="mr-2 text-green-500" />
-                  <span>{blog.views} views</span>
-                </div>
-              </div>
-            </div>
+            </figure>
           </header>
 
-          <div className="prose max-w-none bg-white rounded-xl p-4 sm:p-6 shadow-md">
-            <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-              <h2 className="text-[26px] sm:text-3xl font-semibold text-primary mb-2">
-                {blog.introContentHeading}
-              </h2>
-              <p className="text-[17px] sm:text-lg">{firstPart}</p>
+          {/* Editorial Body Column */}
+          <div className="bg-[#FFFFFF] border border-[#E4DFD7] p-6 sm:p-10 md:p-14">
+            <div className="max-w-[68ch] mx-auto text-[#111110] leading-[1.85] whitespace-pre-line">
+              {blog.introContentHeading && (
+                <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-[#111110] mb-4 leading-snug">
+                  {blog.introContentHeading}
+                </h2>
+              )}
+
+              <p className="text-[17px] sm:text-[19px] text-[#262522] font-editorial leading-[1.8]">
+                {firstPart}
+              </p>
 
               {blog.secondary_image && (
-                <div className="my-6 sm:my-8 rounded-xl overflow-hidden">
+                <figure className="my-10 border border-[#E4DFD7] bg-[#FAF8F5] p-2">
                   <Image
                     src={
                       blog.secondary_image.startsWith("http")
                         ? blog.secondary_image
                         : `${API_URL}/${blog.secondary_image.replace(/\\/g, "/")}`
                     }
-                    alt={`${blog.title} - Additional content`}
+                    alt={`${blog.title} - Visual Plate`}
                     width={825}
                     height={450}
-                    className="w-full h-auto object-cover rounded-xl"
+                    className="w-full h-auto object-cover"
                   />
-                </div>
+                </figure>
               )}
 
-              <h3 className="text-[26px] sm:text-3xl font-semibold text-primary mb-2">
-                {blog.contentHeading}
-              </h3>
-              <p className="text-[17px] sm:text-lg">{secondPart}</p>
-              <LikeButton blogId={blog.id} />
+              {blog.contentHeading && (
+                <h3 className="font-editorial text-2xl sm:text-3xl font-bold text-[#111110] mt-10 mb-4 leading-snug">
+                  {blog.contentHeading}
+                </h3>
+              )}
+
+              <p className="text-base sm:text-[17px] text-[#262522] leading-[1.85]">
+                {secondPart}
+              </p>
+
+              <div className="mt-12 pt-8 border-t border-[#111110] flex items-center justify-between">
+                <span className="font-mono-meta text-xs uppercase tracking-wider text-[#57544E]">
+                  End of Dispatch
+                </span>
+                <LikeButton blogId={blog.id} />
+              </div>
             </div>
           </div>
-          <div className="mt-8 bg-white rounded-xl shadow-md p-6 md:p-8">
-            <div>
-              <h3 className="text-xl font-semibold text-primary mb-4">
-                Comments
+
+          {/* Reader Correspondence / Comments */}
+          <section className="mt-12 bg-[#FFFFFF] border border-[#111110] p-6 sm:p-10">
+            <div className="pb-4 mb-6 border-b border-[#E4DFD7] flex items-baseline justify-between">
+              <h3 className="font-editorial text-2xl font-bold text-[#111110]">
+                Reader Correspondence
               </h3>
-
-              <CommentForm blogId={blog.id} />
-              <CommentList comments={comments} />
+              <span className="font-mono-meta text-xs uppercase tracking-wider text-[#57544E]">
+                {comments.length} {comments.length === 1 ? "Response" : "Responses"}
+              </span>
             </div>
-          </div>
+
+            <CommentForm blogId={blog.id} />
+            <CommentList comments={comments} />
+          </section>
         </div>
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-primary mb-6">
-            Related Articles
-          </h2>
-          <BlogGrid blogs={relatedBlogs} />
-        </div>
+        {relatedBlogs.length > 0 && (
+          <section className="mt-20 pt-12 border-t border-[#111110]">
+            <div className="mb-8">
+              <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+                Further Reading
+              </span>
+              <h2 className="font-editorial text-3xl font-bold text-[#111110] mt-1">
+                Related Dispatches
+              </h2>
+            </div>
+            <BlogGrid blogs={relatedBlogs} />
+          </section>
+        )}
       </div>
     </article>
   );

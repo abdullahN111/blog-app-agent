@@ -9,7 +9,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function CommentForm({ blogId }) {
   const { data: session } = useSession();
-  // console.log("Session data:", session);
 
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -63,22 +62,24 @@ export default function CommentForm({ blogId }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
+    <form onSubmit={handleSubmit} className="mb-8">
       <textarea
         rows={4}
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Write a comment..."
-        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none resize-none"
-      ></textarea>
+        placeholder="Contribute a considered response to this dispatch..."
+        className="w-full p-4 bg-[#FAF8F5] border border-[#111110] text-sm text-[#111110] placeholder:text-[#85817A] focus:outline-none focus:border-[#C83E2B] resize-none"
+      />
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-3 px-5 py-2 bg-primary text-white font-medium rounded-lg shadow hover:bg-middle transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? "Posting..." : "Post Comment"}
-      </button>
+      <div className="mt-3 flex justify-end">
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-6 py-2.5 bg-[#111110] text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Publishing..." : "Publish Response"}
+        </button>
+      </div>
     </form>
   );
 }

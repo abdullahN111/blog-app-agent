@@ -1,7 +1,7 @@
 "use client";
 
 const baseClasses =
-  "w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-middle/30 focus:border-middle transition-colors";
+  "w-full px-4 py-3 bg-[#FAF8F5] border border-[#111110] text-sm text-[#111110] placeholder:text-[#85817A] focus:outline-none focus:bg-[#FFFFFF] focus:border-[#C83E2B] transition-colors";
 
 export default function FormField({
   type = "text",
@@ -19,9 +19,9 @@ export default function FormField({
     <div>
       <label
         htmlFor={id}
-        className="block text-sm font-medium text-primary mb-2"
+        className="block text-xs font-mono-meta uppercase tracking-[0.12em] text-[#111110] font-medium mb-2"
       >
-        {label} {required && "*"}
+        {label} {required && <span className="text-[#C83E2B]">*</span>}
       </label>
 
       {type === "textarea" ? (
@@ -33,7 +33,7 @@ export default function FormField({
           onChange={onChange}
           required={required}
           placeholder={placeholder}
-          className={`${baseClasses} resize-none`}
+          className={`${baseClasses} resize-none leading-relaxed`}
         />
       ) : type === "select" ? (
         <select

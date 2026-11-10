@@ -58,7 +58,7 @@ content:
 
 Writing requirements:
 - Human-like, engaging writing.
-- No headings or markdown formatting.
+- No headings or markdown formatting, just plain text.
 - No title inside introContent or content.
 - Natural flow from introduction into main body.
 - Clear, professional English.

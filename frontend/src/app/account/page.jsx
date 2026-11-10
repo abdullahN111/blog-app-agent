@@ -1,13 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]/route";
 import Image from "next/image";
-import {
-  FiHeart,
-  FiFileText,
-  FiMail,
-  FiAward,
-  FiTrendingUp,
-} from "react-icons/fi";
+import Link from "next/link";
+import { FiMail, FiPlus } from "react-icons/fi";
 import LikedBlogsTable from "../../components/LikedBlogsTable";
 import PublishedBlogsTable from "../../components/PublishedBlogsTable";
 import SessionExpired from "../../components/SessionExpired";
@@ -19,14 +14,16 @@ export default async function AccountPage() {
 
   if (!session) {
     return (
-      <main className="min-h-[70vh] flex items-center justify-center px-6">
-        <div className="bg-white rounded-3xl shadow-xl p-12 text-center max-w-lg border">
-          <h1 className="text-4xl font-bold text-primary">
-            You're not signed in
+      <main className="min-h-[70vh] flex items-center justify-center px-6 bg-[#FAF8F5]">
+        <div className="bg-[#FFFFFF] border border-[#111110] shadow-[6px_6px_0px_#111110] p-12 text-center max-w-lg">
+          <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+            Authentication Required
+          </span>
+          <h1 className="font-editorial text-4xl font-bold text-[#111110] mt-2">
+            You&apos;re not signed in
           </h1>
-
-          <p className="text-gray-500 mt-4">
-            Login with Google to manage your account and liked blogs.
+          <p className="text-[#57544E] text-sm mt-3 leading-relaxed">
+            Sign in with your Google account to access your saved reading list and editorial desk.
           </p>
         </div>
       </main>
@@ -90,134 +87,151 @@ export default async function AccountPage() {
   const totalPublishedBlogs = publishedBlogData.length;
 
   return (
-    <main className="bg-gray-50 min-h-screen py-10">
+    <main className="bg-[#FAF8F5] min-h-screen py-12 md:py-16">
       <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary via-primary to-middle text-white shadow-xl">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10"></div>
-          <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-white/5"></div>
+        {/* Editorial Profile Masthead */}
+        <section className="border border-[#111110] bg-[#FFFFFF]">
+          <div className="p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+              {session.user.image && (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name}
+                  width={96}
+                  height={96}
+                  className="border border-[#111110] object-cover"
+                />
+              )}
 
-          <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8 p-10">
-            <Image
-              src={session.user.image}
-              alt={session.user.name}
-              width={120}
-              height={120}
-              className="rounded-full border-4 border-white shadow-xl"
-            />
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="px-2.5 py-0.5 bg-[#111110] text-[#FAF8F5] text-[11px] font-mono-meta uppercase tracking-[0.14em]">
+                    {isAdmin ? "Managing Editor" : "Subscriber"}
+                  </span>
+                  <span className="px-2.5 py-0.5 border border-[#E4DFD7] bg-[#FAF8F5] text-[#57544E] text-[11px] font-mono-meta uppercase tracking-[0.14em]">
+                    Active Credentials
+                  </span>
+                </div>
 
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-4xl font-bold">{session.user.name}</h1>
+                <h1 className="font-editorial text-3xl sm:text-4xl font-bold text-[#111110]">
+                  {session.user.name}
+                </h1>
 
-              <div className="flex justify-center md:justify-start items-center gap-2 mt-3 opacity-90">
-                <FiMail />
-                <span>{session.user.email}</span>
-              </div>
-
-              <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
-                <span className="bg-white/15 backdrop-blur px-5 py-2 rounded-full text-sm">
-                  {isAdmin ? "Administrator" : "Reader"}
-                </span>
-
-                <span className="bg-white/15 backdrop-blur px-5 py-2 rounded-full text-sm">
-                  Blogout Member
-                </span>
+                <div className="flex items-center gap-2 mt-1.5 text-xs font-mono-meta text-[#57544E]">
+                  <FiMail size={13} />
+                  <span>{session.user.email}</span>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        <section className="grid md:grid-cols-3 gap-6 mt-10">
-          <div className="bg-white rounded-2xl shadow-lg p-7 border hover:-translate-y-1 transition">
-            <FiHeart className="text-red-500 text-3xl mb-4" />
-
-            <p className="text-gray-500">Liked Blogs</p>
-
-            <h2 className="text-4xl font-bold mt-2 text-primary">
-              {likedBlogs.length}
-            </h2>
+            {isAdmin && (
+              <Link
+                href="/create-blog"
+                className="inline-flex items-center gap-2 px-5 py-3 bg-[#111110] text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors"
+              >
+                <FiPlus size={15} />
+                <span>Commission New Dispatch</span>
+              </Link>
+            )}
           </div>
 
-          {isAdmin && (
-            <div className="bg-white rounded-2xl shadow-lg p-7 border hover:-translate-y-1 transition">
-              <FiFileText className="text-middle text-3xl mb-4" />
-
-              <p className="text-gray-500">Published Blogs</p>
-
-              <h2 className="text-4xl font-bold mt-2 text-primary">
-                {totalPublishedBlogs}
-              </h2>
+          {/* Architectural Metric Strip */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-[#111110] divide-y sm:divide-y-0 sm:divide-x divide-[#E4DFD7] bg-[#F3EFEA]">
+            <div className="p-6">
+              <p className="text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#57544E]">
+                Endorsed Dispatches
+              </p>
+              <p className="font-editorial text-4xl font-bold text-[#111110] mt-1">
+                {likedBlogs.length}
+              </p>
             </div>
-          )}
 
-          <div className="bg-white rounded-2xl shadow-lg p-7 border hover:-translate-y-1 transition">
-            <FiTrendingUp className="text-green-500 text-3xl mb-4" />
+            {isAdmin ? (
+              <div className="p-6">
+                <p className="text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#57544E]">
+                  Live Publication Index
+                </p>
+                <p className="font-editorial text-4xl font-bold text-[#111110] mt-1">
+                  {totalPublishedBlogs}
+                </p>
+              </div>
+            ) : (
+              <div className="p-6">
+                <p className="text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#57544E]">
+                  Membership Tier
+                </p>
+                <p className="font-editorial text-2xl font-bold text-[#111110] mt-2">
+                  Reader Edition
+                </p>
+              </div>
+            )}
 
-            <p className="text-gray-500">Status</p>
-
-            <h2 className="text-2xl font-semibold mt-2">Active</h2>
+            <div className="p-6">
+              <p className="text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#57544E]">
+                Desk Status
+              </p>
+              <p className="font-editorial text-2xl font-bold text-[#2A6F4E] mt-2">
+                Verified &amp; Active
+              </p>
+            </div>
           </div>
         </section>
 
         {isAdmin && (
-          <section className="mt-20">
-            <div className="flex items-center gap-3 mb-7">
-              <div className="w-12 h-12 rounded-xl bg-middle/10 flex items-center justify-center">
-                <FiAward className="text-middle text-xl" />
-              </div>
-
+          <section className="mt-16">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-6 border-b border-[#111110] gap-2">
               <div>
-                <h2 className="text-3xl font-bold text-primary">
-                  Your Published Blogs
+                <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+                  Author Ledger
+                </span>
+                <h2 className="font-editorial text-3xl font-bold text-[#111110] mt-1">
+                  Your Commissioned Dispatches
                 </h2>
-
-                <p className="text-gray-500">
-                  Manage everything you've written.
-                </p>
               </div>
+              <p className="text-xs font-mono-meta text-[#57544E]">
+                Manage visibility, revisions, and archival status.
+              </p>
             </div>
 
             {myBlogs.length ? (
               <PublishedBlogsTable blogs={myBlogs} />
             ) : (
-              <div className="bg-white border rounded-3xl shadow-lg p-20 text-center">
-                <FiFileText className="text-6xl text-gray-300 mx-auto mb-5" />
-
-                <h3 className="text-2xl font-semibold text-primary">
-                  No blogs published
+              <div className="bg-[#FFFFFF] border border-[#E4DFD7] p-16 text-center">
+                <h3 className="font-editorial text-2xl font-bold text-[#111110]">
+                  No dispatches commissioned yet
                 </h3>
-
-                <p className="text-gray-500 mt-3">
-                  Create your first article from the Create Blog page.
+                <p className="text-xs font-mono-meta uppercase tracking-wider text-[#85817A] mt-2">
+                  Use the Create Blog studio to generate your first essay.
                 </p>
               </div>
             )}
           </section>
         )}
+
         <section className="mt-16">
-          <div className="flex items-center gap-3 mb-7">
-            <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
-              <FiHeart className="text-red-500 text-xl" />
-            </div>
-
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-6 border-b border-[#111110] gap-2">
             <div>
-              <h2 className="text-3xl font-bold text-primary">Liked Blogs</h2>
-
-              <p className="text-gray-500">Blogs you've saved for later.</p>
+              <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+                Personal Anthology
+              </span>
+              <h2 className="font-editorial text-3xl font-bold text-[#111110] mt-1">
+                Endorsed Reading List
+              </h2>
             </div>
+            <p className="text-xs font-mono-meta text-[#57544E]">
+              Essays you have endorsed and saved for reference.
+            </p>
           </div>
 
           {likedBlogs.length ? (
             <LikedBlogsTable blogs={likedBlogs} />
           ) : (
-            <div className="bg-white border rounded-3xl shadow-lg p-20 text-center">
-              <FiHeart className="text-6xl text-gray-300 mx-auto mb-5" />
-
-              <h3 className="text-2xl font-semibold text-primary">
-                No liked blogs yet
+            <div className="bg-[#FFFFFF] border border-[#E4DFD7] p-16 text-center">
+              <h3 className="font-editorial text-2xl font-bold text-[#111110]">
+                Your reading list is empty
               </h3>
-
-              <p className="text-gray-500 mt-3">
-                Start exploring and like articles you enjoy.
+              <p className="text-xs font-mono-meta uppercase tracking-wider text-[#85817A] mt-2">
+                Endorse essays across the archive to save them here.
               </p>
             </div>
           )}

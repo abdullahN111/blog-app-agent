@@ -1,68 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #171717;
-  --primary: #1e2939;
-  --secondary: #5bbafc;
-  --middle: #e91e63;
-  --higher: #dbeafe;
+  --background: #faf8f5;
+  --surface: #f3efea;
+  --elevated: #ffffff;
+  --foreground: #111110;
+  --muted: #57544e;
+  --subtle: #85817a;
+  --border-subtle: #e4dfd7;
+  --border-strong: #111110;
+  --primary: #111110;
+  --secondary: #c83e2b;
+  --middle: #c83e2b;
+  --middle-dark: #a63020;
+  --higher: #f3efea;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
   --color-primary: var(--primary);
   --color-primary-hover: var(--secondary);
   --color-secondary: var(--secondary);
   --bg-secondary: var(--secondary);
   --color-middle: var(--middle);
+  --color-middle-dark: var(--middle-dark);
   --bg-middle: var(--middle);
   --border-secondary: var(--secondary);
   --color-higher: var(--higher);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-editorial-serif), Georgia, Cambria, "Times New Roman", serif;
+  --font-sans: var(--font-editorial-sans), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-editorial-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
+.font-editorial {
+  font-family: var(--font-serif);
 }
 
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
+.font-mono-meta {
+  font-family: var(--font-mono);
 }
 
 .line-clamp-2 {
@@ -81,7 +72,7 @@ body {
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 #f1f5f9;
+  scrollbar-color: #c5bfb4 #f3efea;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -89,15 +80,13 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
+  background: #f3efea;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border-radius: 10px;
+  background-color: #c5bfb4;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
+  background-color: #85817a;
 }

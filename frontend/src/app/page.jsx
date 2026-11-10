@@ -38,15 +38,26 @@ export default async function Home() {
   const blogs = await getAllBlogs();
 
   return (
-    <main className="px-3 md:px-6 sm:px-8">
+    <main>
       <Hero />
 
-      <div className="my-12">
-        <h2 className="text-3xl font-bold text-primary text-center mb-10 capitalize">
-          Our Blogs
-        </h2>
+      <section className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-14 md:py-20">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-6 mb-10 border-b border-[#111110] gap-4">
+          <div>
+            <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
+              Latest Dispatches
+            </span>
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#111110] mt-1">
+              Recent Essays &amp; Analysis
+            </h2>
+          </div>
+          <p className="text-xs font-mono-meta uppercase tracking-wider text-[#57544E]">
+            Showing {blogs.length} {blogs.length === 1 ? "Entry" : "Entries"}
+          </p>
+        </div>
+
         <BlogGrid blogs={blogs} />
-      </div>
+      </section>
     </main>
   );
 }

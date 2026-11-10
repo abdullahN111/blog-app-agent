@@ -62,15 +62,14 @@ export default function LikeButton({ blogId }) {
   return (
     <button
       onClick={handleLike}
-      className="mt-6 flex items-center gap-2 text-gray-600 transition cursor-pointer"
+      className={`inline-flex items-center gap-2.5 px-4 py-2 border text-xs font-mono-meta uppercase tracking-wider transition-colors cursor-pointer ${
+        liked
+          ? "border-[#C83E2B] bg-[#C83E2B] text-[#FAF8F5]"
+          : "border-[#111110] bg-[#FAF8F5] text-[#111110] hover:bg-[#111110] hover:text-[#FAF8F5]"
+      }`}
     >
-      {liked ? (
-        <FaHeart className="text-red-500 size-8" />
-      ) : (
-        <FiHeart className="size-8" />
-      )}
-
-      <span className="text-xl">{liked ? "Liked" : "Like"}</span>
+      {liked ? <FaHeart size={14} /> : <FiHeart size={14} />}
+      <span>{liked ? "Endorsed" : "Endorse Essay"}</span>
     </button>
   );
 }

@@ -14,8 +14,8 @@ export default function CategoryBar() {
   const moreRef = useRef(null);
   const mobileMoreRef = useRef(null);
 
-  const visibleCategories = categories.slice(0, 6);
-  const moreCategories = categories.slice(6);
+  const visibleCategories = categories.slice(0, 8);
+  const moreCategories = categories.slice(8);
   const visibleMobileCategories = categories.slice(0, 5);
   const moreMobileCategories = categories.slice(5);
 
@@ -24,7 +24,10 @@ export default function CategoryBar() {
       if (moreRef.current && !moreRef.current.contains(event.target)) {
         setIsMoreOpen(false);
       }
-      if (mobileMoreRef.current && !mobileMoreRef.current.contains(event.target)) {
+      if (
+        mobileMoreRef.current &&
+        !mobileMoreRef.current.contains(event.target)
+      ) {
         setIsMobileMoreOpen(false);
       }
     };
@@ -37,10 +40,23 @@ export default function CategoryBar() {
 
   return (
     <>
-    
-      <div className="hidden md:block border-t border-gray-200">
+      <div className="hidden md:block border-t border-[#E4DFD7] bg-[#FAF8F5]">
         <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8">
-          <div className="flex items-center gap-2 py-2 relative">
+          <div className="flex items-center gap-1 py-2 relative">
+            <span className="text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#85817A] pr-3 mr-2 border-r border-[#E4DFD7]">
+              Sections
+            </span>
+            <Link
+              href="/blogs"
+              className={`px-3 py-1 text-xs font-mono-meta uppercase tracking-wider transition-colors ${
+                pathname === "/blogs"
+                  ? "bg-[#111110] text-[#FAF8F5] font-medium"
+                  : "text-[#57544E] hover:text-[#111110] hover:bg-[#F3EFEA]"
+              }`}
+            >
+              All
+            </Link>
+
             {visibleCategories.map((category) => {
               const slug = generateSlug(category);
               const active = isActive(category);
@@ -48,10 +64,10 @@ export default function CategoryBar() {
                 <Link
                   key={slug}
                   href={`/blogs/category/${slug}`}
-                  className={`px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1 text-xs font-mono-meta uppercase tracking-wider whitespace-nowrap transition-colors ${
                     active
-                      ? "bg-middle text-white font-medium"
-                      : "text-primary hover:bg-gray-100"
+                      ? "bg-[#111110] text-[#FAF8F5] font-medium"
+                      : "text-[#57544E] hover:text-[#111110] hover:bg-[#F3EFEA]"
                   }`}
                 >
                   {category}
@@ -60,19 +76,19 @@ export default function CategoryBar() {
             })}
 
             {moreCategories.length > 0 && (
-              <div className="relative" ref={moreRef}>
+              <div className="relative ml-auto" ref={moreRef}>
                 <button
                   onClick={() => setIsMoreOpen((v) => !v)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-sm text-primary hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono-meta uppercase tracking-wider text-[#111110] border border-[#E4DFD7] hover:border-[#111110] transition-colors cursor-pointer"
                 >
-                  More
+                  More Sections
                   <FiChevronDown
                     className={`transition-transform ${isMoreOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
                 {isMoreOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border z-50 py-2">
+                  <div className="absolute top-full right-0 mt-1.5 w-52 bg-[#FFFFFF] border border-[#111110] shadow-[4px_4px_0px_#111110] z-50 py-1">
                     {moreCategories.map((category) => {
                       const slug = generateSlug(category);
                       const active = isActive(category);
@@ -81,10 +97,10 @@ export default function CategoryBar() {
                           key={slug}
                           href={`/blogs/category/${slug}`}
                           onClick={() => setIsMoreOpen(false)}
-                          className={`block px-4 py-2 transition-colors ${
+                          className={`block px-4 py-2 text-xs font-mono-meta uppercase tracking-wider transition-colors ${
                             active
-                              ? "bg-middle text-white"
-                              : "hover:bg-middle hover:text-white"
+                              ? "bg-[#111110] text-[#FAF8F5]"
+                              : "text-[#111110] hover:bg-[#F3EFEA]"
                           }`}
                         >
                           {category}
@@ -99,19 +115,18 @@ export default function CategoryBar() {
         </div>
       </div>
 
-   
-      <div className="md:hidden border-t border-gray-200 bg-white">
-        <div className="px-4 py-3 flex flex-wrap items-center gap-2 relative">
+      <div className="md:hidden border-t border-[#E4DFD7] bg-[#FAF8F5]">
+        <div className="px-4 py-2.5 flex flex-wrap items-center gap-1.5 relative">
           {visibleMobileCategories.map((category) => {
             const active = isActive(category);
             return (
               <Link
                 key={category}
                 href={`/blogs/category/${generateSlug(category)}`}
-                className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
+                className={`px-2.5 py-1 border text-xs font-mono-meta uppercase tracking-wider transition-colors ${
                   active
-                    ? "bg-middle text-white border-middle"
-                    : "border-gray-300 text-primary hover:bg-middle hover:text-white hover:border-middle"
+                    ? "bg-[#111110] text-[#FAF8F5] border-[#111110]"
+                    : "border-[#E4DFD7] text-[#57544E] hover:border-[#111110] hover:text-[#111110]"
                 }`}
               >
                 {category}
@@ -122,7 +137,7 @@ export default function CategoryBar() {
           <div className="relative" ref={mobileMoreRef}>
             <button
               onClick={() => setIsMobileMoreOpen((v) => !v)}
-              className="px-3 py-1.5 rounded-full border border-gray-300 text-sm text-primary flex items-center gap-1 hover:bg-middle hover:text-white hover:border-middle transition-colors"
+              className="px-2.5 py-1 border border-[#111110] text-xs font-mono-meta uppercase tracking-wider text-[#111110] flex items-center gap-1 transition-colors"
             >
               More
               <FiChevronDown
@@ -131,13 +146,13 @@ export default function CategoryBar() {
             </button>
 
             {isMobileMoreOpen && (
-              <div className="absolute left-0 top-full mt-2 w-52 bg-white rounded-lg shadow-lg border z-50 py-2">
+              <div className="absolute right-0 top-full mt-1.5 w-48 bg-[#FFFFFF] border border-[#111110] shadow-[4px_4px_0px_#111110] z-50 py-1">
                 {moreMobileCategories.map((category) => (
                   <Link
                     key={category}
                     href={`/blogs/category/${generateSlug(category)}`}
                     onClick={() => setIsMobileMoreOpen(false)}
-                    className="block px-4 py-2 hover:bg-middle hover:text-white transition-colors"
+                    className="block px-4 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#F3EFEA] transition-colors"
                   >
                     {category}
                   </Link>

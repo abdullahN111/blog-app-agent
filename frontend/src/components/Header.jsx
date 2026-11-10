@@ -7,14 +7,15 @@ import Link from "next/link";
 import logo from "../../public/assets/logo.png";
 import {
   FiMenu,
-  FiChevronDown,
+  FiChevronRight,
   FiUser,
   FiSearch,
   FiHome,
   FiBookOpen,
   FiInfo,
+  FiPlus,
+  FiX,
 } from "react-icons/fi";
-import { IoIosCreate } from "react-icons/io";
 import CreateBlogModal from "./CreateBlogModal";
 import { usePathname } from "next/navigation";
 import CategoryBar from "./CategoryBar";
@@ -24,16 +25,11 @@ import MobileSearchBar from "./MobileSearchBar";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: session } = useSession();
   const dropdownRef = useRef(null);
   const pathname = usePathname();
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-
-  const toggleMore = () => setIsMoreOpen(!isMoreOpen);
-
-  // console.log(session.id_token);
 
   const isAdmin =
     session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
@@ -65,53 +61,71 @@ export default function Header() {
     pathname === "/blogs" ||
     pathname.startsWith("/blogs/category/");
 
-  // console.log({
-  //   email: session?.user?.email,
-  //   isAdmin,
-  // });
+  const navItems = [
+    { href: "/", label: "Front Page", icon: FiHome },
+    { href: "/blogs", label: "Archive", icon: FiBookOpen },
+    { href: "/about", label: "Masthead", icon: FiInfo },
+  ];
 
   return (
-    <header className="bg-white shadow-md relative">
-      <nav className="max-w-[1440px] mx-auto flex items-center justify-between px-4 md:px-6 lg:px-8 py-1">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center">
-            <Image src={logo} alt="Blogout Logo" width={75} height={75} />
-            <span className="font-semibold text-[22px] sm:text-[23px] md:text-2xl text-primary">
-              Blogout
-            </span>
+    <header className="bg-[#FAF8F5] border-b border-[#111110] sticky top-0 z-40">
+      {/* Top editorial dateline strip */}
+      <div className="hidden md:block border-b border-[#E4DFD7] bg-[#F3EFEA]/70">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-1.5 flex items-center justify-between text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#57544E]">
+          <span>Independent Journal &amp; AI Editorial Studio</span>
+          <span>
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
+        </div>
+      </div>
+
+      <nav className="max-w-[1440px] mx-auto flex items-center justify-between px-4 md:px-6 lg:px-8 h-16 md:h-20">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <Image
+              src={logo}
+              alt="Blogout Logo"
+              width={44}
+              height={44}
+              className="w-10 h-10 object-contain"
+            />
+            <div className="flex flex-col">
+              <span className="font-editorial font-bold text-2xl md:text-[28px] tracking-tight leading-none text-[#111110]">
+                Blogout.
+              </span>
+            </div>
           </Link>
+
+          <ul className="hidden md:flex items-center gap-1 border-l border-[#E4DFD7] pl-6">
+            {navItems.map(({ href, label }) => {
+              const active =
+                href === "/" ? pathname === "/" : pathname.startsWith(href);
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className={`px-3.5 py-2 text-sm font-medium transition-colors ${
+                      active
+                        ? "text-[#111110] font-semibold underline decoration-[#C83E2B] decoration-2 underline-offset-8"
+                        : "text-[#57544E] hover:text-[#111110]"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
-        <ul className="hidden md:flex items-center gap-7 lg:gap-8">
-          <li>
-            <Link
-              href="/"
-              className="text-primary hover:text-middle transition-colors text-base md:text-[17px]"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/blogs"
-              className="text-primary hover:text-middle transition-colors text-base md:text-[17px]"
-            >
-              Blogs
-            </Link>
-          </li>
-
-          <li>
-            <Link
-              href="/about"
-              className="text-primary hover:text-middle transition-colors text-base md:text-[17px]"
-            >
-              About
-            </Link>
-          </li>
-        </ul>
-
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3">
           <SearchBar />
+
           <Link
             href={isAdmin ? "/create-blog" : "#"}
             onClick={(e) => {
@@ -120,101 +134,109 @@ export default function Header() {
                 setShowCreateModal(true);
               }
             }}
-            className="group flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-middle to-[#f31e65] text-white shadow-sm hover:shadow-lg transition-all duration-200"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#111110] text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-[0.12em] font-medium hover:bg-[#C83E2B] transition-colors border border-[#111110]"
           >
-            <IoIosCreate
-              size={18}
-              className="group-hover:rotate-12 transition-transform duration-200"
-            />
-            <span className="font-semibold text-sm">Create Blog</span>
+            <FiPlus size={15} />
+            <span>Create Blog</span>
           </Link>
 
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative pl-2 border-l border-[#E4DFD7]" ref={dropdownRef}>
             {session ? (
-              <>
-                {session.user?.image && (
+              <button
+                onClick={toggleAccountDropdown}
+                className="flex items-center gap-2 py-1 px-1.5 hover:bg-[#F3EFEA] transition-colors cursor-pointer"
+                aria-label="Account"
+              >
+                {session.user?.image ? (
                   <Image
-                    onClick={toggleAccountDropdown}
                     src={session.user.image}
                     alt="User profile"
-                    width={38}
-                    height={38}
-                    className="rounded-full cursor-pointer"
-                    aria-label="Account"
+                    width={34}
+                    height={34}
+                    className="border border-[#111110]"
                   />
+                ) : (
+                  <div className="w-8 h-8 bg-[#111110] text-[#FAF8F5] flex items-center justify-center text-xs font-mono-meta">
+                    {session.user?.name?.charAt(0) || "U"}
+                  </div>
                 )}
-              </>
+              </button>
             ) : (
               <button
                 onClick={toggleAccountDropdown}
-                className="text-middle transition-colors hover:scale-110 duration-200 cursor-pointer mt-2"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#111110] border border-[#E4DFD7] hover:border-[#111110] transition-colors cursor-pointer"
                 aria-label="Account"
               >
-                <FiUser size={28} />
+                <FiUser size={15} />
+                <span>Sign In</span>
               </button>
             )}
 
             <div
-              className={`absolute right-0 top-full mt-2 w-64 bg-white rounded-md shadow-lg py-2 z-50 border border-gray-200
-                transform origin-top transition-all duration-200 ease-out
+              className={`absolute right-0 top-full mt-2 w-72 bg-[#FFFFFF] z-50 border border-[#111110] shadow-[4px_4px_0px_#111110]
+                transform origin-top transition-all duration-150 ease-out
                 ${
                   isAccountDropdownOpen
                     ? "opacity-100 scale-100 pointer-events-auto"
                     : "opacity-0 scale-95 pointer-events-none"
                 }`}
             >
-              <div className="p-4">
+              <div className="p-5">
                 {session ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 pb-3 border-b border-[#E4DFD7]">
                       {session.user?.image && (
                         <Image
                           src={session.user.image}
                           alt="User profile"
                           width={40}
                           height={40}
-                          className="rounded-full"
+                          className="border border-[#111110]"
                         />
                       )}
-                      <div>
-                        <p className="font-semibold text-sm">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-[#111110] truncate">
                           {session.user?.name}
                         </p>
-                        <p className="text-gray-600 text-xs">
+                        <p className="text-[#57544E] text-xs font-mono-meta truncate">
                           {session.user?.email}
                         </p>
                       </div>
                     </div>
-                    {isAdmin ? (
-                      <div className="pt-2 border-t border-gray-100">
-                        <Link
-                          href="/account"
-                          className="block text-middle hover:text-middle-dark text-sm py-1 transition-colors duration-200"
-                          onClick={() => setIsAccountDropdownOpen(false)}
-                        >
-                          Manage Account
-                        </Link>
-                      </div>
-                    ) : (
-                      <></>
-                    )}
+
+                    <div className="space-y-1">
+                      <Link
+                        href="/account"
+                        className="flex items-center justify-between text-[#111110] hover:text-[#C83E2B] text-sm font-medium py-1.5 transition-colors"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                      >
+                        <span>{isAdmin ? "Editorial Desk & Account" : "Saved Reading List"}</span>
+                        <FiChevronRight size={15} />
+                      </Link>
+                    </div>
+
                     <button
                       onClick={() => signOut()}
-                      className="w-full text-left text-red-600 hover:text-red-800 text-sm py-1 transition-colors duration-200 cursor-pointer"
+                      className="w-full text-left pt-3 border-t border-[#E4DFD7] text-[#C83E2B] hover:text-[#A63020] text-xs font-mono-meta uppercase tracking-wider transition-colors cursor-pointer"
                     >
                       Sign Out
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <p className="text-gray-600 text-sm">
-                      You are not signed in.
-                    </p>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="font-editorial text-lg font-semibold text-[#111110]">
+                        Reader &amp; Author Access
+                      </p>
+                      <p className="text-[#57544E] text-xs mt-1 leading-relaxed">
+                        Sign in to curate your reading list, join discussions, or access the editorial studio.
+                      </p>
+                    </div>
                     <button
                       onClick={() => signIn("google")}
-                      className="w-full bg-middle text-white py-2 px-4 rounded-md hover:bg-middle-dark transition-colors duration-200 text-sm cursor-pointer"
+                      className="w-full bg-[#111110] text-[#FAF8F5] py-2.5 px-4 hover:bg-[#C83E2B] transition-colors text-xs font-mono-meta uppercase tracking-wider cursor-pointer"
                     >
-                      Sign in with Google
+                      Continue with Google
                     </button>
                   </div>
                 )}
@@ -223,141 +245,131 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="md:hidden flex items-center gap-1">
+        <div className="md:hidden flex items-center gap-1.5">
           <button
             onClick={() => setIsMobileSearchOpen((v) => !v)}
             aria-label="Search"
-            className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors cursor-pointer ${
+            className={`flex items-center justify-center w-10 h-10 border transition-colors cursor-pointer ${
               isMobileSearchOpen
-                ? "bg-middle/10 text-middle"
-                : "text-primary hover:bg-gray-100"
+                ? "border-[#111110] bg-[#111110] text-[#FAF8F5]"
+                : "border-[#E4DFD7] text-[#111110] hover:border-[#111110]"
             }`}
           >
-            <FiSearch size={20} />
+            <FiSearch size={18} />
           </button>
 
           <button
-            className="flex items-center justify-center w-10 h-10 rounded-full text-primary hover:bg-gray-100 transition-colors cursor-pointer"
+            className="flex items-center justify-center w-10 h-10 border border-[#E4DFD7] text-[#111110] hover:border-[#111110] transition-colors cursor-pointer"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            <FiMenu size={24} />
+            <FiMenu size={20} />
           </button>
         </div>
       </nav>
+
       <MobileSearchBar
         isOpen={isMobileSearchOpen}
         onClose={() => setIsMobileSearchOpen(false)}
       />
+
       {showCategoryBar && <CategoryBar />}
+
+      {/* Mobile Navigation Drawer */}
       <div
-        className={`md:hidden fixed inset-0 bg-black opacity-0 z-40 transition-opacity duration-300 ease-in-out ${
-          isMenuOpen ? "opacity-30" : "opacity-0 pointer-events-none"
+        className={`md:hidden fixed inset-0 bg-[#111110]/40 z-40 transition-opacity duration-200 ${
+          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={toggleMenu}
-      ></div>
+      />
 
       <div
-        className={`md:hidden fixed top-0 right-0 h-full w-4/5 max-w-sm bg-white z-50 shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`md:hidden fixed top-0 right-0 h-full w-4/5 max-w-sm bg-[#FAF8F5] border-l border-[#111110] z-50 transform transition-transform duration-200 ease-out ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="p-4 h-full flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/" className="flex items-center" onClick={toggleMenu}>
-              <Image src={logo} alt="Blogout Logo" width={48} height={48} />
-              <span className="font-semibold text-lg text-primary">
-                Blogout
+        <div className="p-5 h-full flex flex-col">
+          <div className="flex items-center justify-between pb-4 border-b border-[#E4DFD7]">
+            <Link href="/" className="flex items-center gap-2" onClick={toggleMenu}>
+              <Image src={logo} alt="Blogout Logo" width={36} height={36} />
+              <span className="font-editorial font-bold text-xl text-[#111110]">
+                Blogout.
               </span>
             </Link>
 
             <button
               onClick={toggleMenu}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors duration-200"
+              className="w-9 h-9 border border-[#E4DFD7] flex items-center justify-center text-[#111110] hover:border-[#111110]"
               aria-label="Close menu"
             >
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <FiX size={18} />
             </button>
           </div>
 
-          {session ? (
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3 mb-6">
-              {session.user?.image && (
-                <Image
-                  src={session.user.image}
-                  alt="User profile"
-                  width={48}
-                  height={48}
-                  className="rounded-full ring-2 ring-white"
-                />
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm text-primary truncate">
-                  {session.user?.name}
-                </p>
-                <p className="text-gray-500 text-xs truncate">
-                  {session.user?.email}
-                </p>
-              </div>
-              {isAdmin && (
+          <div className="py-5 border-b border-[#E4DFD7]">
+            {session ? (
+              <div className="flex items-center gap-3">
+                {session.user?.image && (
+                  <Image
+                    src={session.user.image}
+                    alt="User profile"
+                    width={44}
+                    height={44}
+                    className="border border-[#111110]"
+                  />
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-sm text-[#111110] truncate">
+                    {session.user?.name}
+                  </p>
+                  <p className="text-[#57544E] text-xs font-mono-meta truncate">
+                    {session.user?.email}
+                  </p>
+                </div>
                 <Link
                   href="/account"
                   onClick={toggleMenu}
-                  className="shrink-0 text-xs font-semibold text-middle hover:text-middle-dark transition-colors"
+                  className="shrink-0 text-xs font-mono-meta uppercase tracking-wider text-[#C83E2B] underline underline-offset-4"
                 >
-                  Manage
+                  Desk
                 </Link>
-              )}
-            </div>
-          ) : (
-            <button
-              onClick={() => signIn("google")}
-              className="w-full bg-gradient-to-r from-middle to-[#f31e65] text-white py-3 px-4 rounded-xl font-semibold transition-all duration-200 text-sm cursor-pointer shadow-sm hover:shadow-md mb-6"
-            >
-              Sign in with Google
-            </button>
-          )}
+              </div>
+            ) : (
+              <button
+                onClick={() => signIn("google")}
+                className="w-full bg-[#111110] text-[#FAF8F5] py-3 px-4 font-mono-meta text-xs uppercase tracking-wider hover:bg-[#C83E2B] transition-colors cursor-pointer"
+              >
+                Sign in with Google
+              </button>
+            )}
+          </div>
 
-          <ul className="flex flex-col gap-1 mb-6">
-            {[
-              { href: "/", label: "Home", icon: FiHome },
-              { href: "/blogs", label: "Blogs", icon: FiBookOpen },
-              { href: "/about", label: "About", icon: FiInfo },
-            ].map(({ href, label, icon: Icon }) => {
+          <ul className="flex flex-col py-4 border-b border-[#E4DFD7]">
+            {navItems.map(({ href, label, icon: Icon }) => {
               const active = pathname === href;
               return (
                 <li key={href}>
                   <Link
                     href={href}
                     onClick={toggleMenu}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[15px] font-medium transition-colors ${
+                    className={`flex items-center justify-between py-3 px-2 text-base font-medium transition-colors ${
                       active
-                        ? "bg-middle/10 text-middle"
-                        : "text-primary hover:bg-gray-50"
+                        ? "text-[#C83E2B] font-semibold"
+                        : "text-[#111110] hover:text-[#C83E2B]"
                     }`}
                   >
-                    <Icon size={18} />
-                    {label}
+                    <span className="flex items-center gap-3">
+                      <Icon size={17} />
+                      {label}
+                    </span>
+                    <FiChevronRight size={16} />
                   </Link>
                 </li>
               );
             })}
           </ul>
 
-          <div className="pt-4 border-t border-gray-100">
+          <div className="py-5">
             <Link
               href={isAdmin ? "/create-blog" : "#"}
               onClick={(e) => {
@@ -371,33 +383,31 @@ export default function Header() {
                 }
                 toggleMenu();
               }}
-              className="flex items-center justify-between px-4 py-3 rounded-xl bg-middle/10 border border-middle/20 hover:bg-middle hover:text-white transition-all group"
+              className="flex items-center justify-between p-4 bg-[#111110] text-[#FAF8F5] hover:bg-[#C83E2B] transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-middle text-white flex items-center justify-center group-hover:bg-white group-hover:text-middle transition-colors">
-                  <IoIosCreate size={20} />
-                </div>
-                <div>
-                  <p className="font-semibold">Create Blog</p>
-                  <p className="text-xs text-gray-500 group-hover:text-white/80">
-                    AI Blog Generator
-                  </p>
-                </div>
+              <div>
+                <p className="font-mono-meta text-xs uppercase tracking-widest text-[#FAF8F5]/70">
+                  Editorial Studio
+                </p>
+                <p className="font-editorial text-lg font-semibold mt-0.5">
+                  Create New Dispatch
+                </p>
               </div>
-              <FiChevronDown className="-rotate-90" />
+              <FiPlus size={20} />
             </Link>
           </div>
 
           {session && (
             <button
               onClick={() => signOut()}
-              className="mt-auto text-left text-red-600 hover:text-red-700 text-sm font-medium py-3 transition-colors duration-200 cursor-pointer"
+              className="mt-auto text-left text-[#C83E2B] text-xs font-mono-meta uppercase tracking-wider py-3 border-t border-[#E4DFD7] cursor-pointer"
             >
               Sign Out
             </button>
           )}
         </div>
       </div>
+
       <CreateBlogModal
         open={showCreateModal}
         onClose={() => setShowCreateModal(false)}

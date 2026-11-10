@@ -12,7 +12,7 @@ export default function ImageUploadBox({
   return (
     <div className="relative">
       {preview ? (
-        <div className="relative rounded-lg overflow-hidden border border-gray-200 h-40">
+        <div className="relative overflow-hidden border border-[#111110] bg-[#FAF8F5] h-44">
           <img
             src={preview}
             alt="Preview"
@@ -21,26 +21,27 @@ export default function ImageUploadBox({
           <button
             type="button"
             onClick={onClear}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors cursor-pointer"
+            className="absolute top-2.5 right-2.5 w-8 h-8 bg-[#111110] text-[#FAF8F5] flex items-center justify-center hover:bg-[#C83E2B] transition-colors cursor-pointer"
+            aria-label="Clear image"
           >
-            <FiX size={16} />
+            <FiX size={15} />
           </button>
         </div>
       ) : (
         <label
           htmlFor={name}
-          className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-middle hover:bg-middle/5 transition-colors group"
+          className="flex flex-col items-center justify-center h-44 border border-dashed border-[#111110] bg-[#FAF8F5] cursor-pointer hover:bg-[#F3EFEA] transition-colors group"
         >
-          <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-middle/10 flex items-center justify-center mb-2 transition-colors">
-            <FiUpload
-              className="text-gray-400 group-hover:text-middle transition-colors"
-              size={18}
-            />
-          </div>
-          <span className="text-sm text-gray-500 group-hover:text-middle transition-colors">
-            Click to upload
+          <FiUpload
+            className="text-[#57544E] group-hover:text-[#C83E2B] mb-2.5 transition-colors"
+            size={20}
+          />
+          <span className="text-xs font-mono-meta uppercase tracking-wider text-[#111110] font-medium">
+            Select Visual Plate
           </span>
-          <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
+          <span className="text-[11px] font-mono-meta text-[#85817A] mt-1">
+            PNG or JPG — Max 5MB
+          </span>
         </label>
       )}
 

@@ -35,51 +35,52 @@ export default function LikedBlogsTable({ blogs }) {
 
   if (!likedBlogs.length) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-14 text-center shadow-sm">
-        <h3 className="text-2xl font-semibold text-slate-900">
-          No liked blogs yet.
+      <div className="border border-[#E4DFD7] bg-[#FFFFFF] p-14 text-center">
+        <h3 className="font-editorial text-2xl font-bold text-[#111110]">
+          No endorsed essays remaining.
         </h3>
-
-        <p className="mt-2 text-slate-500">Like blogs to see them here.</p>
+        <p className="mt-2 text-xs font-mono-meta uppercase tracking-wider text-[#85817A]">
+          Endorse essays across the archive to save them here.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="border border-[#111110] bg-[#FFFFFF]">
       <div className="overflow-x-auto">
-        <table className="min-w-[1100px] w-full table-fixed">
-          <thead className="bg-slate-900">
+        <table className="min-w-[1040px] w-full table-fixed">
+          <thead className="bg-[#F3EFEA] border-b border-[#111110]">
             <tr>
-              <th className="w-[360px] px-7 py-5 text-left text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Blog
+              <th className="w-[380px] px-6 py-4 text-left text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Essay &amp; Section
               </th>
 
-              <th className="px-7 py-5 text-left text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Description
+              <th className="px-6 py-4 text-left text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Lead Excerpt
               </th>
 
-              <th className="w-[170px] px-7 py-5 text-center text-xs font-semibold uppercase tracking-widest text-slate-300">
-                Stats
+              <th className="w-[160px] px-6 py-4 text-center text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
+                Metrics
               </th>
 
-              <th className="w-[220px] px-7 py-5 text-center text-xs font-semibold uppercase tracking-widest text-slate-300">
+              <th className="w-[210px] px-6 py-4 text-center text-[11px] font-mono-meta uppercase tracking-[0.14em] text-[#111110]">
                 Actions
               </th>
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-[#E4DFD7]">
             {likedBlogs.map((blog) => {
               const slug = blog.slug;
 
               return (
                 <tr
                   key={blog.id}
-                  className="border-b border-slate-100 transition-colors hover:bg-slate-50"
+                  className="transition-colors hover:bg-[#FAF8F5]"
                 >
-                  <td className="px-7 py-6">
-                    <div className="flex items-center gap-5">
+                  <td className="px-6 py-5">
+                    <div className="flex items-start gap-4">
                       <Image
                         src={
                           blog.primary_image.startsWith("http")
@@ -87,55 +88,55 @@ export default function LikedBlogsTable({ blogs }) {
                             : `${API_URL}/${blog.primary_image.replace(/\\/g, "/")}`
                         }
                         alt={blog.title}
-                        width={120}
-                        height={78}
-                        className="h-[78px] w-[120px] rounded-lg border border-slate-200 object-cover shadow-sm"
+                        width={108}
+                        height={72}
+                        className="h-[72px] w-[108px] border border-[#E4DFD7] object-cover shrink-0"
                       />
 
                       <div className="min-w-0 flex-1">
-                        <h4 className="line-clamp-2 text-lg font-semibold leading-6 text-slate-900">
+                        <h4 className="line-clamp-2 font-editorial text-lg font-bold leading-snug text-[#111110]">
                           {blog.title}
                         </h4>
 
-                        <span className="mt-3 inline-flex rounded-md border border-middle-200 bg-middle/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-middle">
+                        <span className="mt-2 inline-flex border border-[#E4DFD7] bg-[#F3EFEA] px-2 py-0.5 text-[10px] font-mono-meta uppercase tracking-wider text-[#C83E2B]">
                           {blog.category}
                         </span>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-7 py-6 align-top">
-                    <p className="line-clamp-3 break-words text-[15px] leading-7 text-slate-600">
+                  <td className="px-6 py-5 align-top">
+                    <p className="line-clamp-3 break-words text-sm leading-relaxed text-[#57544E]">
                       {blog.introContent}
                     </p>
                   </td>
 
-                  <td className="px-7 py-6">
-                    <div className="flex flex-col items-center gap-3">
-                      <div className="flex items-center gap-2 text-base text-slate-700">
-                        <FaHeart className="text-red-500 size-4" />
-                        <span className="font-semibold">{blog.likes}</span>
+                  <td className="px-6 py-5">
+                    <div className="flex flex-col items-center gap-2 font-mono-meta text-xs text-[#111110]">
+                      <div className="flex items-center gap-1.5">
+                        <FaHeart className="text-[#C83E2B] size-3.5" />
+                        <span>{blog.likes}</span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-base text-slate-700">
-                        <FiEye className="text-slate-500 size-4" />
-                        <span className="font-semibold">{blog.views}</span>
+                      <div className="flex items-center gap-1.5 text-[#57544E]">
+                        <FiEye className="size-3.5" />
+                        <span>{blog.views}</span>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-7 py-6">
-                    <div className="flex justify-center gap-3">
+                  <td className="px-6 py-5">
+                    <div className="flex justify-center gap-2">
                       <Link
                         href={`/blogs/blog/${slug}`}
-                        className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-all duration-200 hover:border-primary hover:text-primary"
+                        className="border border-[#111110] bg-[#FAF8F5] px-4 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#111110] transition hover:bg-[#111110] hover:text-[#FAF8F5]"
                       >
-                        View
+                        Read
                       </Link>
 
                       <button
                         onClick={() => removeLiked(blog.id)}
-                        className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:bg-red-700 cursor-pointer"
+                        className="border border-[#C83E2B] bg-transparent px-4 py-2 text-xs font-mono-meta uppercase tracking-wider text-[#C83E2B] transition hover:bg-[#C83E2B] hover:text-[#FAF8F5] cursor-pointer"
                       >
                         Remove
                       </button>

@@ -1,68 +1,62 @@
 "use client";
 
 import Link from "next/link";
-import { FiX, FiYoutube, FiCpu } from "react-icons/fi";
+import { FiX, FiArrowUpRight } from "react-icons/fi";
 
 export default function CreateBlogModal({ open, onClose, loggedIn }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-7 shadow-2xl">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#111110]/60 p-4">
+      <div className="relative w-full max-w-lg bg-[#FAF8F5] border border-[#111110] p-8 shadow-[8px_8px_0px_#111110]">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-500 hover:text-black"
+          className="absolute right-5 top-5 w-8 h-8 border border-[#E4DFD7] flex items-center justify-center text-[#57544E] hover:text-[#111110] hover:border-[#111110] cursor-pointer"
+          aria-label="Close modal"
         >
-          <FiX size={22} />
+          <FiX size={18} />
         </button>
 
-        <div className="w-14 h-14 rounded-xl bg-middle text-white flex items-center justify-center mb-5">
-          <FiCpu size={28} />
-        </div>
+        <span className="inline-block font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B] mb-2">
+          Editorial Studio Access
+        </span>
 
-        <h2 className="text-2xl font-bold text-primary mb-3">
-          AI Blog Generator
+        <h2 className="font-editorial text-3xl font-bold text-[#111110] mb-4">
+          AI Dispatch Generator
         </h2>
 
         {!loggedIn ? (
-          <>
-            <p className="text-gray-600 leading-7">
-              Please sign in first to explore this feature.
-            </p>
-          </>
+          <p className="text-[#57544E] text-sm leading-relaxed">
+            Please sign in with your Google account first to explore editorial tools and author permissions.
+          </p>
         ) : (
-          <>
-            <p className="text-gray-600 leading-7">
-              This project includes an AI-powered blog generator that creates
-              complete blog posts from a topic and your perspective.
+          <div className="space-y-3 text-sm text-[#57544E] leading-relaxed">
+            <p>
+              Blogout includes an autonomous editorial agent that drafts structured long-form essays from your thesis and perspective.
             </p>
-
-            <p className="text-gray-600 mt-4 leading-7">
-              Since it relies on paid AI APIs, public access is disabled to
-              prevent unnecessary API usage.
+            <p>
+              To protect API quotas on our live deployment, direct generation is currently restricted to verified editorial accounts.
             </p>
-
-            <p className="text-gray-600 mt-4">
-              I apologize for the limitation. You can watch a complete demo of
-              this feature below.
+            <p className="text-[#111110] font-medium pt-1">
+              Watch the complete studio workflow walkthrough below:
             </p>
 
             <Link
               href="https://www.youtube.com/watch?v=Xn-8I7QdmN8"
               target="_blank"
-              className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-red-600 py-3 text-white font-medium hover:bg-red-700 transition"
+              className="mt-4 flex items-center justify-center gap-2 bg-[#C83E2B] py-3 px-5 text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-wider font-medium hover:bg-[#A63020] transition-colors"
             >
-              <FiYoutube size={20} />
-              Watch Demo
+              <span>Watch Studio Walkthrough</span>
+              <FiArrowUpRight size={16} />
             </Link>
-          </>
+          </div>
         )}
 
         <button
           onClick={onClose}
-          className="mt-6 w-full rounded-xl border py-3 hover:bg-gray-100 transition"
+          className="mt-4 w-full border border-[#111110] bg-transparent py-2.5 text-xs font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#F3EFEA] transition-colors cursor-pointer"
         >
-          Close
+          Dismiss
         </button>
       </div>
     </div>
