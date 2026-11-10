@@ -6,7 +6,7 @@ import { FiPlus, FiTrash2, FiKey, FiCpu } from "react-icons/fi";
 import { toast } from "sonner";
 import PublishedBlogsTable from "./PublishedBlogsTable";
 import LikedBlogsTable from "./LikedBlogsTable";
-import { DEFAULT_BUILTIN_PERSONAS } from "../utils/useCreateBlogForm";
+import { DEFAULT_BUILTIN_PERSONAS } from "../../public/assets/blogRelatedData";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
