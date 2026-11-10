@@ -46,6 +46,7 @@ async def create_blog(blog: models.BlogCreate,
         popularity=blog.popularity,
         primary_image=blog.primary_image,
         secondary_image=blog.secondary_image,
+        published=True if blog.published is None else blog.published,
     )
 
     db.add(new_blog)
@@ -581,6 +582,8 @@ async def update_blog(
 
     blog.primary_image = blog_data.primary_image
     blog.secondary_image = blog_data.secondary_image
+    if blog_data.published is not None:
+        blog.published = blog_data.published
 
     db.commit()
     db.refresh(blog)

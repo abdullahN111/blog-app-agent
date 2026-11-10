@@ -8,6 +8,8 @@ import {
   FiCheck,
   FiLoader,
   FiSave,
+  FiSliders,
+  FiZap,
 } from "react-icons/fi";
 import { categories } from "../../../../../public/assets/blogRelatedData";
 import { generateSlug } from "../../../../utils/utils";
@@ -28,6 +30,9 @@ export default function EditBlogPage() {
 
   const [loading, setLoading] = useState(true);
   const [buttonState, setButtonState] = useState("idle");
+  const [assistLoading, setAssistLoading] = useState(null);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [editorialFeedback, setEditorialFeedback] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -108,6 +113,64 @@ export default function EditBlogPage() {
         ...prev,
         [name]: value,
       }));
+    }
+  };
+
+  const handleRunAssist = async (action, targetField = "content") => {
+    const sourceText = formData[targetField];
+    if (!sourceText || sourceText.trim().length < 15) {
+      toast.error("Not enough text to run AI Co-Pilot.");
+      return;
+    }
+
+    setAssistLoading(action);
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (session?.id_token) {
+        headers.Authorization = `Bearer ${session.id_token}`;
+      }
+      const savedKey =
+        typeof window !== "undefined"
+          ? window.localStorage.getItem("blogout_user_gemini_key")
+          : "";
+      if (savedKey) {
+        headers["X-Gemini-Key"] = savedKey;
+      }
+
+      const res = await fetch(`${API_URL}/agent/assist`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          action,
+          text: sourceText,
+          context_title: formData.title,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.detail || "AI Co-Pilot request failed");
+      }
+
+      const { output } = await res.json();
+      if (action !== "evaluate" && output.revised_text) {
+        setFormData((prev) => ({
+          ...prev,
+          [targetField]: output.revised_text,
+        }));
+      }
+
+      setEditorialFeedback({
+        score: output.quality_score,
+        summary: output.editorial_summary,
+        headlines: output.headline_suggestions || [],
+      });
+
+      toast.success(output.editorial_summary || "Manuscript refined.");
+    } catch (err) {
+      toast.error(err.message || "AI Co-Pilot error");
+    } finally {
+      setAssistLoading(null);
     }
   };
 
@@ -243,9 +306,9 @@ export default function EditBlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+    <div className="min-h-screen bg-[#FAF8F5] py-10 md:py-14 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1380px] mx-auto">
+        <div className="flex items-center justify-between mb-6">
           <button
             type="button"
             onClick={() => router.push("/account")}
@@ -254,14 +317,23 @@ export default function EditBlogPage() {
             <FiArrowLeft size={14} />
             <span>Back to Editorial Desk</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setInspectorOpen((v) => !v)}
+            className="inline-flex items-center gap-2 px-3.5 py-2 border border-[#111110] bg-[#FFFFFF] text-xs font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#F3EFEA] cursor-pointer"
+          >
+            <FiSliders size={14} />
+            <span>{inspectorOpen ? "Hide Inspector" : "Show Inspector"}</span>
+          </button>
         </div>
 
-        <header className="pb-8 mb-10 border-b border-[#111110] flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <header className="pb-6 mb-8 border-b border-[#111110] flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
               Manuscript Revision — ID #{id}
             </span>
-            <h1 className="font-editorial text-4xl sm:text-5xl font-bold text-[#111110] mt-1">
+            <h1 className="font-editorial text-3xl sm:text-5xl font-bold text-[#111110] mt-1">
               Edit Dispatch
             </h1>
           </div>
@@ -270,14 +342,78 @@ export default function EditBlogPage() {
           </p>
         </header>
 
-        <div className="bg-[#FFFFFF] border border-[#111110] shadow-[6px_6px_0px_#111110]">
-          <form onSubmit={handleSubmit} className="divide-y divide-[#E4DFD7]">
-            {/* Metadata & Thesis */}
-            <div className="p-6 sm:p-10 space-y-6">
-              <h2 className="font-editorial text-2xl font-bold text-[#111110] pb-3 border-b border-[#E4DFD7]">
-                01. Headline, Thesis &amp; Desk
-              </h2>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+        >
+          {/* Left / Main Canvas: Manuscript Prose & AI Co-Pilot */}
+          <div
+            className={`${
+              inspectorOpen ? "lg:col-span-8" : "lg:col-span-12 max-w-4xl mx-auto w-full"
+            } bg-[#FFFFFF] border border-[#111110] shadow-[6px_6px_0px_#111110] divide-y divide-[#E4DFD7]`}
+          >
+            {/* Contextual AI Co-Pilot Toolbar */}
+            <div className="p-4 sm:p-5 bg-[#F3EFEA] flex flex-wrap items-center justify-between gap-2">
+              <span className="font-mono-meta text-[11px] uppercase tracking-[0.14em] text-[#111110] font-medium flex items-center gap-1.5">
+                <FiZap className="text-[#C83E2B]" />
+                <span>AI Co-Pilot:</span>
+              </span>
 
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "sharpen", label: "Sharpen Prose" },
+                  { id: "expand", label: "Expand Analysis" },
+                  { id: "condense", label: "Condense 25%" },
+                  { id: "counter_argument", label: "+ Steelman Counter" },
+                  { id: "evaluate", label: "Evaluate Quality" },
+                ].map((tool) => (
+                  <button
+                    key={tool.id}
+                    type="button"
+                    disabled={Boolean(assistLoading)}
+                    onClick={() => handleRunAssist(tool.id, "content")}
+                    className="px-2.5 py-1.5 bg-[#FFFFFF] border border-[#111110] text-[11px] font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#111110] hover:text-[#FAF8F5] transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {assistLoading === tool.id ? "Running..." : tool.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {editorialFeedback && (
+              <div className="p-5 bg-[#FAF8F5] border-b border-[#E4DFD7] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono-meta text-[11px] uppercase tracking-wider text-[#C83E2B] font-semibold">
+                    Co-Pilot Desk Critique
+                  </span>
+                  <span className="px-2 py-0.5 bg-[#111110] text-[#FAF8F5] font-mono-meta text-[11px]">
+                    Score: {editorialFeedback.score}/100
+                  </span>
+                </div>
+                <p className="text-xs text-[#262522] leading-relaxed">
+                  {editorialFeedback.summary}
+                </p>
+                {editorialFeedback.headlines?.length > 0 && (
+                  <div className="pt-2 flex flex-wrap gap-1.5">
+                    {editorialFeedback.headlines.map((h, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, title: h }))
+                        }
+                        className="text-left px-2.5 py-1 bg-[#FFFFFF] border border-[#E4DFD7] hover:border-[#111110] text-xs font-editorial text-[#111110] cursor-pointer"
+                      >
+                        Use: &ldquo;{h}&rdquo;
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Manuscript Fields */}
+            <div className="p-6 sm:p-10 space-y-6">
               <div>
                 <label htmlFor="title" className={labelClass}>
                   Headline <span className="text-[#C83E2B]">*</span>
@@ -289,71 +425,9 @@ export default function EditBlogPage() {
                   value={formData.title}
                   onChange={handleChange}
                   required
-                  className={fieldClass}
+                  className={`${fieldClass} font-editorial text-xl font-bold`}
                 />
               </div>
-
-              <div>
-                <label htmlFor="perspective" className={labelClass}>
-                  Author Perspective / Prompt Brief <span className="text-[#C83E2B]">*</span>
-                </label>
-                <textarea
-                  id="perspective"
-                  name="perspective"
-                  rows={4}
-                  value={formData.perspective}
-                  onChange={handleChange}
-                  required
-                  className={`${fieldClass} leading-relaxed`}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="category" className={labelClass}>
-                    Section Desk <span className="text-[#C83E2B]">*</span>
-                  </label>
-                  <select
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                    className={fieldClass}
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category} value={generateSlug(category)}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="popularity" className={labelClass}>
-                    Editorial Weight
-                  </label>
-                  <select
-                    id="popularity"
-                    name="popularity"
-                    value={formData.popularity}
-                    onChange={handleChange}
-                    className={fieldClass}
-                  >
-                    <option value="low">Niche / Emerging Signal</option>
-                    <option value="medium">Standard Editorial Interest</option>
-                    <option value="high">High-Priority / Lead Feature</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Manuscript Copy */}
-            <div className="p-6 sm:p-10 space-y-6">
-              <h2 className="font-editorial text-2xl font-bold text-[#111110] pb-3 border-b border-[#E4DFD7]">
-                02. Manuscript Copy
-              </h2>
 
               <div>
                 <label htmlFor="introContentHeading" className={labelClass}>
@@ -404,84 +478,11 @@ export default function EditBlogPage() {
                 <textarea
                   id="content"
                   name="content"
-                  rows={16}
+                  rows={18}
                   value={formData.content}
                   onChange={handleChange}
                   className={`${fieldClass} leading-relaxed`}
                 />
-              </div>
-            </div>
-
-            {/* Photographic Plates */}
-            <div className="p-6 sm:p-10 space-y-6">
-              <h2 className="font-editorial text-2xl font-bold text-[#111110] pb-3 border-b border-[#E4DFD7]">
-                03. Photographic Plates
-              </h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <label htmlFor="primaryImage" className={labelClass}>
-                    Primary Lead Plate
-                  </label>
-
-                  {existingImages.primary && (
-                    <div className="mb-3 border border-[#E4DFD7] p-2 bg-[#FAF8F5]">
-                      <img
-                        src={
-                          existingImages.primary.startsWith("http")
-                            ? existingImages.primary
-                            : `${API_URL}/${existingImages.primary.replace(/\\/g, "/")}`
-                        }
-                        alt="Current primary"
-                        className="w-full h-44 object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <input
-                    type="file"
-                    id="primaryImage"
-                    name="primaryImage"
-                    accept="image/*"
-                    onChange={handleChange}
-                    className="w-full px-3 py-2.5 bg-[#FAF8F5] border border-[#111110] text-xs font-mono-meta file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-xs file:font-mono-meta file:uppercase file:bg-[#111110] file:text-[#FAF8F5] hover:file:bg-[#C83E2B] file:cursor-pointer"
-                  />
-                  <p className="mt-1.5 text-[11px] font-mono-meta text-[#85817A]">
-                    Leave empty to retain current primary plate.
-                  </p>
-                </div>
-
-                <div>
-                  <label htmlFor="secondaryImage" className={labelClass}>
-                    Secondary In-Essay Plate
-                  </label>
-
-                  {existingImages.secondary && (
-                    <div className="mb-3 border border-[#E4DFD7] p-2 bg-[#FAF8F5]">
-                      <img
-                        src={
-                          existingImages.secondary.startsWith("http")
-                            ? existingImages.secondary
-                            : `${API_URL}/${existingImages.secondary.replace(/\\/g, "/")}`
-                        }
-                        alt="Current secondary"
-                        className="w-full h-44 object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <input
-                    type="file"
-                    id="secondaryImage"
-                    name="secondaryImage"
-                    accept="image/*"
-                    onChange={handleChange}
-                    className="w-full px-3 py-2.5 bg-[#FAF8F5] border border-[#111110] text-xs font-mono-meta file:mr-3 file:py-1.5 file:px-3 file:border-0 file:text-xs file:font-mono-meta file:uppercase file:bg-[#111110] file:text-[#FAF8F5] hover:file:bg-[#C83E2B] file:cursor-pointer"
-                  />
-                  <p className="mt-1.5 text-[11px] font-mono-meta text-[#85817A]">
-                    Leave empty to retain current secondary plate.
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -519,8 +520,136 @@ export default function EditBlogPage() {
                 )}
               </button>
             </div>
-          </form>
-        </div>
+          </div>
+
+          {/* Right Column: Collapsible Metadata & Visual Plates Inspector */}
+          {inspectorOpen && (
+            <aside className="lg:col-span-4 space-y-6">
+              <div className="bg-[#FFFFFF] border border-[#111110] p-6 space-y-5">
+                <h2 className="font-editorial text-xl font-bold text-[#111110] pb-3 border-b border-[#E4DFD7]">
+                  Desk &amp; Thesis Inspector
+                </h2>
+
+                <div>
+                  <label htmlFor="category" className={labelClass}>
+                    Section Desk <span className="text-[#C83E2B]">*</span>
+                  </label>
+                  <select
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    className={fieldClass}
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((category) => (
+                      <option key={category} value={generateSlug(category)}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="popularity" className={labelClass}>
+                    Editorial Weight
+                  </label>
+                  <select
+                    id="popularity"
+                    name="popularity"
+                    value={formData.popularity}
+                    onChange={handleChange}
+                    className={fieldClass}
+                  >
+                    <option value="low">Niche / Emerging Signal</option>
+                    <option value="medium">Standard Editorial Interest</option>
+                    <option value="high">High-Priority / Lead Feature</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="perspective" className={labelClass}>
+                    Author Perspective / Thesis <span className="text-[#C83E2B]">*</span>
+                  </label>
+                  <textarea
+                    id="perspective"
+                    name="perspective"
+                    rows={4}
+                    value={formData.perspective}
+                    onChange={handleChange}
+                    required
+                    className={`${fieldClass} leading-relaxed`}
+                  />
+                </div>
+              </div>
+
+              <div className="bg-[#FFFFFF] border border-[#111110] p-6 space-y-5">
+                <h2 className="font-editorial text-xl font-bold text-[#111110] pb-3 border-b border-[#E4DFD7]">
+                  Photographic Plates
+                </h2>
+
+                <div>
+                  <label htmlFor="primaryImage" className={labelClass}>
+                    Primary Lead Plate
+                  </label>
+
+                  {existingImages.primary && (
+                    <div className="mb-3 border border-[#E4DFD7] p-2 bg-[#FAF8F5]">
+                      <img
+                        src={
+                          existingImages.primary.startsWith("http")
+                            ? existingImages.primary
+                            : `${API_URL}/${existingImages.primary.replace(/\\/g, "/")}`
+                        }
+                        alt="Current primary"
+                        className="w-full h-36 object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    id="primaryImage"
+                    name="primaryImage"
+                    accept="image/*"
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#111110] text-xs font-mono-meta file:mr-3 file:py-1 file:px-2.5 file:border-0 file:text-xs file:font-mono-meta file:uppercase file:bg-[#111110] file:text-[#FAF8F5] hover:file:bg-[#C83E2B] file:cursor-pointer"
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-[#E4DFD7]">
+                  <label htmlFor="secondaryImage" className={labelClass}>
+                    Secondary In-Essay Plate
+                  </label>
+
+                  {existingImages.secondary && (
+                    <div className="mb-3 border border-[#E4DFD7] p-2 bg-[#FAF8F5]">
+                      <img
+                        src={
+                          existingImages.secondary.startsWith("http")
+                            ? existingImages.secondary
+                            : `${API_URL}/${existingImages.secondary.replace(/\\/g, "/")}`
+                        }
+                        alt="Current secondary"
+                        className="w-full h-36 object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <input
+                    type="file"
+                    id="secondaryImage"
+                    name="secondaryImage"
+                    accept="image/*"
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#111110] text-xs font-mono-meta file:mr-3 file:py-1 file:px-2.5 file:border-0 file:text-xs file:font-mono-meta file:uppercase file:bg-[#111110] file:text-[#FAF8F5] hover:file:bg-[#C83E2B] file:cursor-pointer"
+                  />
+                </div>
+              </div>
+            </aside>
+          )}
+        </form>
       </div>
     </div>
   );

@@ -107,6 +107,35 @@ class BlogView(Base):
         ),
     )
 
+
+class AgentPersona(Base):
+    __tablename__ = "agent_personas"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String, nullable=False)
+    role_description = Column(String, nullable=False)
+    tone = Column(String, default="Analytical & Editorial", nullable=False)
+    system_instructions = Column(Text, nullable=False)
+    is_public = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    owner = relationship("User", backref="agent_personas")
+
+
+class AgentUsageLog(Base):
+    __tablename__ = "agent_usage_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    action_type = Column(String, default="generate_blog", nullable=False)
+    prompt_hash = Column(String, nullable=True, index=True)
+    estimated_tokens = Column(Integer, default=1200, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+
+    user = relationship("User", backref="agent_usage_logs")
+
+
 class BlogBase(BaseModel):
     title: str
     perspective: str
@@ -118,6 +147,7 @@ class BlogBase(BaseModel):
     popularity: str = "medium"
     primary_image: Optional[str] = None
     secondary_image: Optional[str] = None
+    published: Optional[bool] = True
 
 
 class BlogCreate(BlogBase):
@@ -131,6 +161,23 @@ class BlogModel(BlogBase):
     views: int   
     published: bool
     likes: int = 0
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AgentPersonaCreate(BaseModel):
+    name: str
+    role_description: str
+    tone: str = "Analytical & Editorial"
+    system_instructions: str
+    is_public: bool = False
+
+
+class AgentPersonaModel(AgentPersonaCreate):
+    id: int
+    user_id: int
     created_at: datetime
 
     class Config:

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FiX, FiArrowUpRight } from "react-icons/fi";
+import { FiX, FiArrowUpRight, FiArrowRight } from "react-icons/fi";
 
 export default function CreateBlogModal({ open, onClose, loggedIn }) {
   if (!open) return null;
@@ -27,7 +27,7 @@ export default function CreateBlogModal({ open, onClose, loggedIn }) {
 
         {!loggedIn ? (
           <p className="text-[#57544E] text-sm leading-relaxed">
-            Please sign in with your Google account first to explore editorial tools and author permissions.
+            Please sign in with your Google account first to explore editorial tools, custom agent personas, and author permissions.
           </p>
         ) : (
           <div className="space-y-3 text-sm text-[#57544E] leading-relaxed">
@@ -35,26 +35,34 @@ export default function CreateBlogModal({ open, onClose, loggedIn }) {
               Blogout includes an autonomous editorial agent that drafts structured long-form essays from your thesis and perspective.
             </p>
             <p>
-              To protect API quotas on our live deployment, direct generation is currently restricted to verified editorial accounts.
-            </p>
-            <p className="text-[#111110] font-medium pt-1">
-              Watch the complete studio workflow walkthrough below:
+              Every registered user now receives a protected daily studio quota (5 generations / 24h) or can connect a personal free Google AI Studio key for unlimited generations.
             </p>
 
-            <Link
-              href="https://www.youtube.com/watch?v=Xn-8I7QdmN8"
-              target="_blank"
-              className="mt-4 flex items-center justify-center gap-2 bg-[#C83E2B] py-3 px-5 text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-wider font-medium hover:bg-[#A63020] transition-colors"
-            >
-              <span>Watch Studio Walkthrough</span>
-              <FiArrowUpRight size={16} />
-            </Link>
+            <div className="pt-3 flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/create-blog"
+                onClick={onClose}
+                className="flex-1 flex items-center justify-center gap-2 bg-[#111110] py-3 px-4 text-[#FAF8F5] text-xs font-mono-meta uppercase tracking-wider font-medium hover:bg-[#C83E2B] transition-colors"
+              >
+                <span>Open AI Studio</span>
+                <FiArrowRight size={15} />
+              </Link>
+
+              <Link
+                href="https://www.youtube.com/watch?v=Xn-8I7QdmN8"
+                target="_blank"
+                className="flex-1 flex items-center justify-center gap-2 border border-[#111110] bg-[#FFFFFF] py-3 px-4 text-[#111110] text-xs font-mono-meta uppercase tracking-wider font-medium hover:bg-[#F3EFEA] transition-colors"
+              >
+                <span>Watch Demo</span>
+                <FiArrowUpRight size={15} />
+              </Link>
+            </div>
           </div>
         )}
 
         <button
           onClick={onClose}
-          className="mt-4 w-full border border-[#111110] bg-transparent py-2.5 text-xs font-mono-meta uppercase tracking-wider text-[#111110] hover:bg-[#F3EFEA] transition-colors cursor-pointer"
+          className="mt-4 w-full border border-[#E4DFD7] bg-transparent py-2.5 text-xs font-mono-meta uppercase tracking-wider text-[#57544E] hover:text-[#111110] hover:border-[#111110] transition-colors cursor-pointer"
         >
           Dismiss
         </button>

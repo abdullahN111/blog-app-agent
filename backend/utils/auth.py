@@ -18,6 +18,7 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 # Use HTTPBearer for better Swagger UI support
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Security(security),
@@ -64,3 +65,15 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication failed"
         )
+
+
+def get_optional_user(
+    credentials: HTTPAuthorizationCredentials | None = Security(optional_security),
+    db: Session = Depends(get_db),
+) -> User | None:
+    if not credentials or not credentials.credentials:
+        return None
+    try:
+        return get_current_user(credentials=credentials, db=db)
+    except HTTPException:
+        return None

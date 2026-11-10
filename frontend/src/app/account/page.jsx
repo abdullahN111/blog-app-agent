@@ -3,8 +3,7 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import Image from "next/image";
 import Link from "next/link";
 import { FiMail, FiPlus } from "react-icons/fi";
-import LikedBlogsTable from "../../components/LikedBlogsTable";
-import PublishedBlogsTable from "../../components/PublishedBlogsTable";
+import AccountWorkspace from "../../components/AccountWorkspace";
 import SessionExpired from "../../components/SessionExpired";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -177,65 +176,11 @@ export default async function AccountPage() {
           </div>
         </section>
 
-        {isAdmin && (
-          <section className="mt-16">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-6 border-b border-[#111110] gap-2">
-              <div>
-                <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
-                  Author Ledger
-                </span>
-                <h2 className="font-editorial text-3xl font-bold text-[#111110] mt-1">
-                  Your Commissioned Dispatches
-                </h2>
-              </div>
-              <p className="text-xs font-mono-meta text-[#57544E]">
-                Manage visibility, revisions, and archival status.
-              </p>
-            </div>
-
-            {myBlogs.length ? (
-              <PublishedBlogsTable blogs={myBlogs} />
-            ) : (
-              <div className="bg-[#FFFFFF] border border-[#E4DFD7] p-16 text-center">
-                <h3 className="font-editorial text-2xl font-bold text-[#111110]">
-                  No dispatches commissioned yet
-                </h3>
-                <p className="text-xs font-mono-meta uppercase tracking-wider text-[#85817A] mt-2">
-                  Use the Create Blog studio to generate your first essay.
-                </p>
-              </div>
-            )}
-          </section>
-        )}
-
-        <section className="mt-16">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 mb-6 border-b border-[#111110] gap-2">
-            <div>
-              <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
-                Personal Anthology
-              </span>
-              <h2 className="font-editorial text-3xl font-bold text-[#111110] mt-1">
-                Endorsed Reading List
-              </h2>
-            </div>
-            <p className="text-xs font-mono-meta text-[#57544E]">
-              Essays you have endorsed and saved for reference.
-            </p>
-          </div>
-
-          {likedBlogs.length ? (
-            <LikedBlogsTable blogs={likedBlogs} />
-          ) : (
-            <div className="bg-[#FFFFFF] border border-[#E4DFD7] p-16 text-center">
-              <h3 className="font-editorial text-2xl font-bold text-[#111110]">
-                Your reading list is empty
-              </h3>
-              <p className="text-xs font-mono-meta uppercase tracking-wider text-[#85817A] mt-2">
-                Endorse essays across the archive to save them here.
-              </p>
-            </div>
-          )}
-        </section>
+        <AccountWorkspace
+          isAdmin={isAdmin}
+          myBlogs={myBlogs}
+          likedBlogs={likedBlogs}
+        />
       </div>
     </main>
   );
