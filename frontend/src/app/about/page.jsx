@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { FiArrowUpRight } from "react-icons/fi";
 
@@ -31,27 +32,47 @@ export default function AboutPage() {
     <main className="bg-[#FAF8F5]">
       <section className="border-b border-[#111110]">
         <div className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-          <div className="max-w-3xl">
-            <span className="inline-block font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B] mb-3">
-              Masthead &amp; Editorial Charter
-            </span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7">
+              <span className="inline-block font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B] mb-3">
+                Masthead &amp; Editorial Charter
+              </span>
 
-            <h1 className="font-editorial text-4xl sm:text-6xl font-bold text-[#111110] leading-[1.08] tracking-tight">
-              Human perspective at the center. Autonomous agents on the desk.
-            </h1>
+              <h1 className="font-editorial text-4xl sm:text-6xl font-bold text-[#111110] leading-[1.08] tracking-tight">
+                Human perspective at the center. Autonomous agents on the desk.
+              </h1>
 
-            <p className="mt-6 text-base sm:text-lg text-[#57544E] leading-relaxed">
-              Blogout transforms raw thesis statements and field notes into complete, structured essays. Provide a working title and your distinct viewpoint; our editorial agent composes a cohesive lead and deep-dive analysis ready for publication.
-            </p>
+              <p className="mt-6 text-base sm:text-lg text-[#57544E] leading-relaxed">
+                Blogout transforms raw thesis statements and field notes into complete, structured essays. Provide a working title and your distinct viewpoint; our editorial agent composes a cohesive lead and deep-dive analysis ready for publication.
+              </p>
 
-            <div className="mt-8">
-              <Link
-                href="/blogs"
-                className="inline-flex items-center gap-2 bg-[#111110] text-[#FAF8F5] px-6 py-3.5 text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors"
-              >
-                <span>Browse The Archive</span>
-                <FiArrowUpRight size={16} />
-              </Link>
+              <div className="mt-8">
+                <Link
+                  href="/blogs"
+                  className="inline-flex items-center gap-2 bg-[#111110] text-[#FAF8F5] px-6 py-3.5 text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors"
+                >
+                  <span>Browse The Archive</span>
+                  <FiArrowUpRight size={16} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5">
+              <figure className="border border-[#111110] bg-[#F3EFEA] p-3 shadow-[6px_6px_0px_#111110]">
+                <div className="border border-[#111110] bg-[#FAF8F5] overflow-hidden">
+                  <Image
+                    src="/assets/editorial-masthead.jpg"
+                    alt="Vintage Letterpress & Precision Compass Illustration"
+                    width={960}
+                    height={540}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+                <figcaption className="pt-2.5 flex items-center justify-between text-[11px] font-mono-meta uppercase tracking-wider text-[#57544E]">
+                  <span>Fig 02. Letterpress &amp; Compass</span>
+                  <span>Editorial Engine</span>
+                </figcaption>
+              </figure>
             </div>
           </div>
         </div>
@@ -92,27 +113,42 @@ export default function AboutPage() {
       </section>
 
       <section className="max-w-[1440px] mx-auto px-4 md:px-6 lg:px-8 py-16 md:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center border border-[#111110] bg-[#F3EFEA] p-8 sm:p-12">
-          <div className="lg:col-span-8 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center border border-[#111110] bg-[#F3EFEA] p-6 sm:p-12 shadow-[6px_6px_0px_#111110]">
+          <div className="lg:col-span-6 space-y-5">
             <span className="font-mono-meta text-[11px] uppercase tracking-[0.16em] text-[#C83E2B]">
               Editorial Statement
             </span>
-            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#111110]">
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-[#111110] leading-tight">
               Built for writers who value substance over boilerplate.
             </h2>
-            <p className="text-[#57544E] text-base leading-relaxed max-w-2xl">
+            <p className="text-[#57544E] text-base leading-relaxed">
               We believe every writer has observations worth publishing. By pairing your conviction with structured agentic drafting, Blogout eliminates blank-page friction while preserving editorial voice.
             </p>
+            <div className="pt-2">
+              <Link
+                href="/blogs"
+                className="inline-flex items-center gap-2 bg-[#111110] text-[#FAF8F5] px-7 py-4 text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors"
+              >
+                <span>Enter The Reading Room</span>
+                <FiArrowUpRight size={16} />
+              </Link>
+            </div>
           </div>
 
-          <div className="lg:col-span-4 flex lg:justify-end">
-            <Link
-              href="/blogs"
-              className="inline-flex items-center gap-2 bg-[#111110] text-[#FAF8F5] px-7 py-4 text-xs font-mono-meta uppercase tracking-[0.14em] font-medium hover:bg-[#C83E2B] transition-colors"
-            >
-              <span>Enter Archive</span>
-              <FiArrowUpRight size={16} />
-            </Link>
+          <div className="lg:col-span-6">
+            <figure className="border border-[#111110] bg-[#FAF8F5] p-2.5">
+              <Image
+                src="/assets/editorial-archive.jpg"
+                alt="The Blogout Archive & Reading Room"
+                width={960}
+                height={540}
+                className="w-full h-auto object-cover border border-[#E4DFD7]"
+              />
+              <figcaption className="pt-2 flex items-center justify-between text-[11px] font-mono-meta uppercase tracking-wider text-[#57544E]">
+                <span>Fig 03. The Permanent Reading Room</span>
+                <span>Archive Wing</span>
+              </figcaption>
+            </figure>
           </div>
         </div>
       </section>
